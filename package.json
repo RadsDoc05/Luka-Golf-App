@@ -1,0 +1,11 @@
+{
+  "name": "luka-golf-adventure",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Luka's 18-Hole Golf Adventure",
+  "dependencies": {
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/android": "^6.2.0"
+  }
+}

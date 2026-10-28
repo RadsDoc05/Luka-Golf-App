@@ -1,7 +1,7 @@
 {
   "appId": "com.luka.golfadventure",
   "appName": "Luka Golf Adventure",
-  "webDir": ".",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"

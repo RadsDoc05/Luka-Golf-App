@@ -53,24 +53,28 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Capacitor & Sync
+      - name: Prepare Web Assets for Capacitor
         run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap add android || true
-          npx cap sync android || true
+          mkdir -p www
+          cp -r index.html src assets www/
 
-      - name: Build Debug APK with Gradle
+      - name: Install Capacitor Dependencies
         run: |
-          if [ -d "android" ]; then
-            cd android
-            chmod +x gradlew
-            ./gradlew assembleDebug
-          fi
+          npm install
+
+      - name: Add Android Platform & Sync
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Build Android Debug APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: LukaGolfAdventure-APK
-          path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: warn
+          path: android/app/build/outputs/apk/debug/app-debug.apk
