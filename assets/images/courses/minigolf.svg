@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  <defs>
+    <linearGradient id="mgSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4A148C"/>
+      <stop offset="55%" stop-color="#7B1FA2"/>
+      <stop offset="100%" stop-color="#F48FB1"/>
+    </linearGradient>
+    <linearGradient id="mgCarpet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#00C853"/>
+    </linearGradient>
+  </defs>
+  <!-- Carnival Twilight Sky -->
+  <rect width="1280" height="390" fill="url(#mgSky)"/>
+  <!-- Carnival Pennant Bunting Flags -->
+  <path d="M0 70 Q 320 130 640 70 T 1280 70" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <!-- Ferris Wheel Silhouette Left -->
+  <circle cx="210" cy="240" r="115" fill="none" stroke="#FFEA00" stroke-width="6"/>
+  <circle cx="210" cy="240" r="18" fill="#FF4081"/>
+  <line x1="210" y1="240" x2="155" y2="390" stroke="#80D8FF" stroke-width="8"/>
+  <line x1="210" y1="240" x2="265" y2="390" stroke="#80D8FF" stroke-width="8"/>
+  <!-- Roller Coaster Loops Right -->
+  <path d="M850 390 Q 940 160 1030 390 Q 1120 210 1240 390" fill="none" stroke="#00E5FF" stroke-width="8"/>
+  <!-- Mini-Golf Park Surroundings -->
+  <rect y="385" width="1280" height="415" fill="#1E88E5"/>
+  <!-- Decorative Brick-Bordered Mini-Golf Course Track -->
+  <path d="M360 390 L 920 390 L 1060 760 L 220 760 Z" fill="url(#mgCarpet)" stroke="#FF5252" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M360 390 L 920 390 L 1060 760 L 220 760 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-dasharray="28 28"/>
+</svg>

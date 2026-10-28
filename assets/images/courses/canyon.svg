@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  <defs>
+    <linearGradient id="canyonSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB74D"/>
+      <stop offset="60%" stop-color="#FFE082"/>
+      <stop offset="100%" stop-color="#FFF8E1"/>
+    </linearGradient>
+    <linearGradient id="canyonTurf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7CB342"/>
+      <stop offset="60%" stop-color="#558B2F"/>
+      <stop offset="100%" stop-color="#33691E"/>
+    </linearGradient>
+  </defs>
+  <!-- Golden Canyon Sky -->
+  <rect width="1280" height="420" fill="url(#canyonSky)"/>
+  <!-- Red Rock Mesas / Canyon Walls -->
+  <polygon points="0,410 40,210 260,210 330,410" fill="#D84315"/>
+  <polygon points="280,410 340,250 510,250 570,410" fill="#BF360C"/>
+  <polygon points="880,410 950,180 1210,180 1280,410" fill="#D84315"/>
+  <!-- Cascading Waterfall on Right Mesa -->
+  <rect x="1030" y="180" width="65" height="260" fill="#29B6F6"/>
+  <ellipse cx="1062" cy="445" rx="75" ry="26" fill="#4FC3F7"/>
+  <!-- Canyon Floor & Emerald Fairway -->
+  <path d="M0 405 Q 640 385 1280 405 L 1280 800 L 0 800 Z" fill="#E64A19"/>
+  <path d="M460 398 L 820 398 L 1120 800 L 160 800 Z" fill="url(#canyonTurf)"/>
+  <!-- Rickety Rope Bridge Hazard (Left) -->
+  <g transform="translate(150, 520)">
+    <path d="M0 40 Q 90 65 180 40" fill="none" stroke="#8D6E63" stroke-width="10"/>
+    <path d="M0 10 Q 90 35 180 10" fill="none" stroke="#5D4037" stroke-width="4"/>
+    <rect x="25" y="38" width="22" height="12" fill="#6D4C41"/>
+    <rect x="60" y="44" width="22" height="12" fill="#6D4C41"/>
+    <rect x="95" y="44" width="22" height="12" fill="#6D4C41"/>
+    <rect x="130" y="38" width="22" height="12" fill="#6D4C41"/>
+  </g>
+</svg>

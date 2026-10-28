@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <!-- Jump Shadow -->
+  <ellipse cx="120" cy="300" rx="45" ry="11" fill="rgba(0,0,0,0.2)"/>
+  <!-- Jumping Legs -->
+  <path d="M95 200 L 70 250 M 145 200 L 170 250" stroke="#FFCCBC" stroke-width="18" stroke-linecap="round"/>
+  <ellipse cx="65" cy="255" rx="20" ry="10" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <ellipse cx="175" cy="255" rx="20" ry="10" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <!-- Shorts & Polo -->
+  <rect x="80" y="165" width="80" height="42" rx="10" fill="#FFF59D" stroke="#263238" stroke-width="4"/>
+  <rect x="75" y="95" width="90" height="78" rx="20" fill="#29B6F6" stroke="#263238" stroke-width="4"/>
+  <rect x="77" y="125" width="86" height="16" fill="#FFEE58"/>
+  <!-- Both Arms Raised Cheering -->
+  <path d="M80 110 L 40 50 M 160 110 L 200 50" stroke="#FFCCBC" stroke-width="16" stroke-linecap="round"/>
+  <!-- Club Held High in Victory -->
+  <line x1="200" y1="50" x2="225" y2="8" stroke="#B0BEC5" stroke-width="6" stroke-linecap="round"/>
+  <!-- Smiling Face -->
+  <circle cx="120" cy="60" r="38" fill="#FFCCBC" stroke="#263238" stroke-width="4"/>
+  <circle cx="106" cy="58" r="5" fill="#263238"/>
+  <circle cx="134" cy="58" r="5" fill="#263238"/>
+  <path d="M104 72 Q 120 88 136 72 Z" fill="#D32F2F" stroke="#263238" stroke-width="3"/>
+  <path d="M82 48 Q 120 12 158 48 Z" fill="#FF5252" stroke="#263238" stroke-width="4"/>
+</svg>

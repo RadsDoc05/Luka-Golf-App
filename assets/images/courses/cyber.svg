@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  <defs>
+    <linearGradient id="cyberSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A0033"/>
+      <stop offset="60%" stop-color="#311B92"/>
+      <stop offset="100%" stop-color="#6A1B9A"/>
+    </linearGradient>
+    <linearGradient id="cyberTurf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="15%" stop-color="#00838F"/>
+      <stop offset="100%" stop-color="#004D40"/>
+    </linearGradient>
+  </defs>
+  <!-- Cyber Night Sky -->
+  <rect width="1280" height="420" fill="url(#cyberSky)"/>
+  <!-- Neon Moon / Grid Sun -->
+  <circle cx="640" cy="230" r="110" fill="#FF007F" opacity="0.8"/>
+  <!-- Futuristic Skyline -->
+  <rect x="60" y="180" width="85" height="230" fill="#120024" stroke="#00E5FF" stroke-width="3"/>
+  <rect x="170" y="130" width="100" height="280" fill="#120024" stroke="#FF007F" stroke-width="3"/>
+  <rect x="980" y="140" width="95" height="270" fill="#120024" stroke="#00E5FF" stroke-width="3"/>
+  <rect x="1100" y="200" width="90" height="210" fill="#120024" stroke="#76FF03" stroke-width="3"/>
+  <!-- Glowing Cyber Fairway -->
+  <rect y="400" width="1280" height="400" fill="url(#cyberTurf)"/>
+  <path d="M500 400 L 780 400 L 1080 800 L 200 800 Z" fill="#1DE9B6" opacity="0.45"/>
+  <!-- Perspective Grid Lines -->
+  <g stroke="#00E5FF" stroke-width="2" opacity="0.5">
+    <line x1="0" y1="460" x2="1280" y2="460"/>
+    <line x1="0" y1="540" x2="1280" y2="540"/>
+    <line x1="0" y1="640" x2="1280" y2="640"/>
+    <line x1="0" y1="760" x2="1280" y2="760"/>
+  </g>
+  <!-- Neon Light Posts -->
+  <g stroke="#EA80FC" stroke-width="8" stroke-linecap="round">
+    <line x1="150" y1="560" x2="150" y2="390"/>
+    <line x1="1130" y1="560" x2="1130" y2="390"/>
+  </g>
+  <circle cx="150" cy="385" r="18" fill="#00E5FF"/>
+  <circle cx="1130" cy="385" r="18" fill="#00E5FF"/>
+  <!-- Slapstick Hazard: Floating Hovercar on Right -->
+  <g transform="translate(920, 490)">
+    <ellipse cx="90" cy="65" rx="95" ry="22" fill="#00E5FF" opacity="0.45"/>
+    <path d="M15 45 L 45 10 L 135 10 L 165 45 Z" fill="#80D8FF" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="0" y="40" width="180" height="32" rx="16" fill="#FF4081" stroke="#FF80AB" stroke-width="3"/>
+    <circle cx="30" cy="56" r="9" fill="#FFEA00"/>
+    <circle cx="150" cy="56" r="9" fill="#FFEA00"/>
+  </g>
+  <!-- Glass Trap Hazard Left -->
+  <ellipse cx="260" cy="580" rx="85" ry="32" fill="#E0F7FA" opacity="0.7" stroke="#00E5FF" stroke-width="5"/>
+</svg>

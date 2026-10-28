@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200" width="120" height="200">
+  <!-- Cup Hole -->
+  <ellipse cx="30" cy="182" rx="22" ry="9" fill="#263238" stroke="#FFFFFF" stroke-width="3"/>
+  <!-- Flagpole -->
+  <line x1="30" y1="182" x2="30" y2="16" stroke="#FFF9C4" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="30" cy="14" r="7" fill="#FFD600" stroke="#263238" stroke-width="3"/>
+  <!-- Fluttering Pennant Flag -->
+  <path d="M33 20 L 112 45 L 33 75 Z" fill="#FF1744" stroke="#263238" stroke-width="4" stroke-linejoin="round"/>
+</svg>

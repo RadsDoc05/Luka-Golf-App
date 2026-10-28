@@ -1,0 +1,2379 @@
+/**
+ * styles.css
+ * Child-friendly, high-contrast responsive UI for Luka's 18-Hole Golf Adventure.
+ * Supports:
+ *   - Onn Android Tablet (1280x800 native 16:10 landscape)
+ *   - Mobile Phones in Landscape (auto-scaled 1280x720..800 virtual stage)
+ *   - Mobile Phones in Portrait (auto-scaled 720x1180..1420 3-tier vertical stage with 16:10 canvas window)
+ *   - Desktop Monitors
+ */
+
+:root {
+  --bg-dark: #07111E;
+  --panel-bg: rgba(16, 32, 50, 0.92);
+  --panel-border: #FFD600;
+  --primary-green: #00E676;
+  --primary-green-dark: #00C853;
+  --accent-blue: #00B0FF;
+  --accent-orange: #FF6D00;
+  --accent-pink: #FF4081;
+  --text-light: #FFFFFF;
+  --text-gold: #FFD600;
+  --font-display: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Rounded', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-display);
+  color: var(--text-light);
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+/* ============================================================================
+   VIEWPORT AUTO-SCALER ROOT & VIRTUAL STAGE (#viewport-root -> #game-stage)
+   ============================================================================ */
+#viewport-root {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #10253E 0%, #050C16 100%);
+}
+
+#game-stage {
+  position: relative;
+  width: 1280px;
+  height: 800px;
+  transform-origin: center center;
+  overflow: hidden;
+  background-color: #0D1B2A;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
+  flex-shrink: 0;
+}
+
+/* Main App Shell inside #game-stage */
+#app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Full-Screen Canvas Viewport in BOTH Landscape and Portrait! */
+.canvas-viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   MINIMAL FLOATING GAMEPLAY HUD: CLEAN BACK TO MENU ARROW & AUDIO BUTTON
+   (Leaves the entire top of the screen clear for the sky, clouds & animations!)
+   ============================================================================ */
+.gameplay-hud {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.gameplay-hud > * {
+  pointer-events: auto;
+}
+
+/* Big Kid-Friendly Back-to-Menu Button */
+.gameplay-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0288D1, #01579B);
+  border: 3.5px solid #FFF59D;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s ease, filter 0.12s ease;
+  flex-shrink: 0;
+}
+
+.gameplay-back-btn:active {
+  transform: scale(0.93);
+}
+
+.gameplay-back-btn .back-arrow {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Top-Right Audio Prompt Button */
+.gameplay-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #FF9100, #E65100);
+  border: 3.5px solid #FFFFFF;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease;
+  flex-shrink: 0;
+}
+
+.gameplay-audio-btn:active {
+  transform: scale(0.93);
+}
+
+.gameplay-audio-btn .icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Status Chips Docked Directly inside the Bottom Math Deck */
+.deck-status-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.chip-pill {
+  background: rgba(10, 24, 42, 0.85);
+  border: 2px solid rgba(79, 195, 247, 0.6);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.chip-pill.chip-hole {
+  border-color: #81D4FA;
+  color: #FFF59D;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.chip-pill.chip-target {
+  border-color: #FFD600;
+  background: rgba(45, 32, 2, 0.85);
+}
+
+.chip-pill.chip-target strong {
+  color: #FFD600;
+}
+
+.chip-pill.chip-strokes {
+  border-color: #4FC3F7;
+}
+
+.chip-pill.chip-mega {
+  border-color: #FF9800;
+  background: rgba(44, 22, 6, 0.85);
+  color: #FFE082;
+  transition: all 0.25s ease;
+}
+
+.chip-pill.chip-mega.unlocked {
+  border-color: #00E676;
+  background: linear-gradient(135deg, rgba(0, 200, 83, 0.92), rgba(255, 214, 0, 0.92));
+  color: #0D1B2A;
+  font-weight: 900;
+  animation: megaMeterPulse 1.1s infinite alternate;
+}
+
+@keyframes megaMeterPulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(0, 230, 118, 0.7); }
+  100% { transform: scale(1.08); box-shadow: 0 0 24px rgba(255, 214, 0, 0.95); }
+}
+
+.chip-pill.chip-coins {
+  border-color: #FFD600;
+  color: #FFD600;
+}
+
+/* Universal Hidden Utility & Defensive Cleanup */
+.hidden {
+  display: none !important;
+}
+
+#btn-mega-drive,
+.mega-drive-btn,
+#mega-unlocked-banner,
+.mega-unlocked-banner {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Main Menu Parental Gate Button */
+.menu-parental-row {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.brand-gate-btn {
+  position: relative;
+  min-width: 280px;
+  min-height: 58px;
+  padding: 8px 22px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #37474F, #263238);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  color: #ECEFF1;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.12s ease;
+}
+
+.brand-gate-btn:active {
+  transform: scale(0.97);
+}
+
+.gate-hold-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 6px;
+  width: 0%;
+  background: #FFD600;
+  transition: width 0.08s linear;
+}
+
+/* ============================================================================
+   BOTTOM CONCRETE MATH CONTROLLER DECK (AUTO-FADES ON ANSWER SELECTION!)
+   ============================================================================ */
+.math-deck {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  margin: 0;
+  width: min(96%, 1180px);
+  background: rgba(12, 25, 42, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 4px solid var(--panel-border);
+  border-radius: 26px;
+  padding: 8px 16px 12px 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 1;
+  transition: opacity 0.26s ease, transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
+
+.math-deck.faded-out {
+  opacity: 0;
+  transform: translate(-50%, 120%);
+  pointer-events: none;
+}
+
+.prompt-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.prompt-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FFF59D;
+  margin: 0;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.math-workspace {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Large Number Driver & Putt Answer Cards (>= 96x96 dp) */
+.number-card {
+  min-width: 175px;
+  min-height: 86px;
+  padding: 8px 20px;
+  border-radius: 22px;
+  border: 4px solid #29B6F6;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E1F5FE 100%);
+  color: #0D47A1;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #0277BD, 0 8px 16px rgba(0,0,0,0.4);
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
+}
+
+.number-card .sub-unit {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0288D1;
+  text-transform: uppercase;
+  margin-top: -4px;
+}
+
+.number-card:hover,
+.number-card:focus-visible {
+  transform: scale(1.04);
+}
+
+.number-card:active {
+  transform: translateY(5px) scale(0.97);
+  box-shadow: 0 3px 0 #0277BD;
+}
+
+.number-card.selected {
+  border-color: #FFD600;
+  background: linear-gradient(180deg, #FFF9C4 0%, #FFE082 100%);
+  color: #E65100;
+  box-shadow: 0 8px 0 #F57F17, 0 0 22px rgba(255, 214, 0, 0.85);
+}
+
+/* Advanced Base-10 Assembly Layout */
+.base10-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.base10-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+}
+
+.base10-card {
+  min-width: 106px;
+  min-height: 84px;
+  padding: 6px 12px;
+  font-size: 32px;
+}
+
+.base10-plus {
+  font-size: 36px;
+  font-weight: 900;
+  color: #FFD600;
+}
+
+.merge-launch-btn {
+  min-width: 195px;
+  min-height: 86px;
+  padding: 10px 20px;
+  border-radius: 22px;
+  border: 5px solid #FFFFFF;
+  background: linear-gradient(180deg, #00E676, #00C853);
+  color: #003314;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 7px 0 #1B5E20, 0 10px 22px rgba(0, 230, 118, 0.45);
+  transition: transform 0.15s ease, opacity 0.2s;
+}
+
+.merge-launch-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Tier 2: Approach Shot +10 Stepping Stone Power Blocks */
+.stepping-stones-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stone-block-btn {
+  min-width: 104px;
+  min-height: 84px;
+  border-radius: 20px;
+  border: 4px solid #80D8FF;
+  background: rgba(13, 71, 161, 0.75);
+  color: #E1F5FE;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #0D47A1;
+  transition: all 0.14s ease;
+}
+
+.stone-block-btn .stone-total {
+  font-size: 14px;
+  color: #FFF59D;
+  font-weight: 800;
+}
+
+.stone-block-btn.active {
+  background: linear-gradient(180deg, #FFD600, #FFAB00);
+  border-color: #FFFFFF;
+  color: #263238;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 7px 0 #FF6F00, 0 0 18px rgba(255, 214, 0, 0.8);
+}
+
+.stone-block-btn.active .stone-total {
+  color: #BF360C;
+}
+
+.power-readout-box {
+  min-width: 145px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 3px solid #FFD600;
+  text-align: center;
+}
+
+.power-readout-box .power-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: #00E676;
+}
+
+/* Tier 3: Putting Green Visual Golf Ball Counters */
+.putting-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.ball-equation-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(46, 125, 50, 0.55);
+  border: 3px solid #A5D6A7;
+  padding: 8px 16px;
+  border-radius: 22px;
+}
+
+.addend-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.balls-cluster {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.countable-ball-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid #37474F;
+  background: radial-gradient(circle at 35% 30%, #FFFFFF, #CFD8DC);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: #0D47A1;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #455A64;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.14s ease;
+}
+
+.countable-ball-btn.counted {
+  background: radial-gradient(circle at 35% 30%, #FFF59D, #FFD600);
+  border-color: #F57F17;
+  color: #BF360C;
+  transform: scale(1.12);
+}
+
+/* Intuitive Subtraction Take-Away Ball Styling */
+.countable-ball-btn.taken-away {
+  background: rgba(211, 47, 47, 0.35);
+  border: 3px dashed #FF5252;
+  color: #FF8A80;
+  opacity: 0.65;
+  transform: scale(0.9);
+  box-shadow: none;
+}
+
+.subtract-tray-banner {
+  font-size: 15px;
+  font-weight: 900;
+  color: #FFF59D;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 2px solid #FFD600;
+}
+
+.addend-digit {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+
+.putt-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ============================================================================
+   MODAL OVERLAYS (INSIDE #game-stage SO THEY AUTO-SCALE ON MOBILE & TABLET!)
+   ============================================================================ */
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 85;
+  background: rgba(8, 16, 28, 0.88);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  width: min(94%, 880px);
+  max-height: 92%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: linear-gradient(180deg, #162B44 0%, #0E1D2F 100%);
+  border: 5px solid #FFD600;
+  border-radius: 30px;
+  padding: 20px 26px;
+  text-align: center;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.75);
+}
+
+.modal-title {
+  font-size: 34px;
+  font-weight: 900;
+  color: #FFD600;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 0 rgba(0,0,0,0.5);
+}
+
+.modal-subtitle {
+  font-size: 20px;
+  color: #E1F5FE;
+  margin: 0 0 16px 0;
+}
+
+.big-cta-btn {
+  min-width: 210px;
+  min-height: 76px;
+  padding: 12px 24px;
+  border-radius: 22px;
+  border: 4px solid #FFFFFF;
+  background: linear-gradient(180deg, #00E676, #00C853);
+  color: #002910;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #1B5E20, 0 10px 20px rgba(0,0,0,0.45);
+  margin: 6px;
+}
+
+.big-cta-btn.secondary {
+  background: linear-gradient(180deg, #29B6F6, #0288D1);
+  color: #FFFFFF;
+  box-shadow: 0 6px 0 #01579B;
+}
+
+.big-cta-btn.danger {
+  background: linear-gradient(180deg, #FF5252, #D32F2F);
+  color: #FFFFFF;
+  box-shadow: 0 6px 0 #8E0000;
+}
+
+/* Course Select Grid */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 12px 0;
+}
+
+.course-card-btn {
+  min-height: 108px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  border: 4px solid #4FC3F7;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.14s ease, border-color 0.14s;
+}
+
+.course-card-btn:hover {
+  transform: scale(1.02);
+  border-color: #FFD600;
+}
+
+.course-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.course-icon {
+  font-size: 42px;
+}
+
+.course-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFF59D;
+}
+
+.course-meta {
+  font-size: 14px;
+  color: #B3E5FC;
+}
+
+.course-star-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+}
+
+.course-star-badge img {
+  width: 48px;
+  height: 48px;
+}
+
+/* Trophy Room Grid */
+.trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.trophy-item {
+  padding: 12px;
+  border-radius: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  opacity: 0.45;
+}
+
+.trophy-item.unlocked {
+  opacity: 1;
+  border-color: #FFD600;
+  background: rgba(255, 214, 0, 0.14);
+}
+
+.trophy-item .t-icon {
+  font-size: 36px;
+}
+
+.trophy-item .t-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: #FFD600;
+}
+
+.trophy-item .t-desc {
+  font-size: 13px;
+  color: #E1F5FE;
+}
+
+/* Parental Gate Controls */
+.parental-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 12px 18px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  text-align: left;
+  gap: 12px;
+}
+
+.parental-row label {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.toggle-pill-btn {
+  min-width: 170px;
+  min-height: 58px;
+  padding: 8px 18px;
+  border-radius: 16px;
+  border: 3px solid #FFFFFF;
+  background: #0288D1;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   GAMEPLAY VARIETY ELEMENTS: AIM BAR, TURBO BOOST, PRO SHOP, MINI-GAMES
+   ============================================================================ */
+.aim-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.aim-bar.hidden {
+  display: none !important;
+}
+
+.aim-lane-btn {
+  min-width: 145px;
+  min-height: 48px;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.45);
+  background: rgba(13, 35, 58, 0.88);
+  color: #E1F5FE;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.12s ease, border-color 0.12s, background 0.12s;
+}
+
+.aim-lane-btn.active {
+  background: linear-gradient(180deg, #FFD600, #FFA000);
+  color: #1A237E;
+  border-color: #FFFFFF;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.6);
+}
+
+/* Mid-Flight Turbo Boost Floating Button */
+.turbo-boost-btn {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  z-index: 35;
+  min-width: 250px;
+  min-height: 96px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  border: 6px solid #FFFFFF;
+  background: linear-gradient(135deg, #FF1744, #FF9100, #FFEA00);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 10px 0 #B71C1C, 0 0 35px rgba(255, 234, 0, 0.95);
+  animation: turboPulse 0.42s infinite alternate;
+}
+
+.turbo-boost-btn.hidden {
+  display: none !important;
+}
+
+/* Centered Sky Mega Power Drive Active Indicator Badge */
+.mega-active-indicator {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  background: linear-gradient(135deg, rgba(255, 23, 68, 0.95), rgba(255, 145, 0, 0.95), rgba(255, 234, 0, 0.95));
+  border: 4px solid #FFFFFF;
+  border-radius: 999px;
+  padding: 8px 24px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  text-shadow: 0 2px 0 #BF360C;
+  box-shadow: 0 0 35px rgba(255, 214, 0, 0.95), 0 6px 16px rgba(0, 0, 0, 0.6);
+  animation: megaPulse 0.5s infinite alternate ease-in-out;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.mega-active-indicator.hidden {
+  display: none !important;
+}
+
+/* Center Mega Power Drive Unlock Modal */
+.mega-center-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.mega-center-popup.hidden {
+  display: none !important;
+}
+
+.mega-center-card {
+  background: radial-gradient(circle, #311B92 0%, #1A0033 100%);
+  border: 5px solid #FFD600;
+  border-radius: 28px;
+  padding: 24px 32px;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 0 50px rgba(255, 214, 0, 0.9), 0 12px 30px rgba(0, 0, 0, 0.7);
+  animation: dbzCenterPulse 1.2s infinite alternate ease-in-out;
+  max-width: 460px;
+  width: 90vw;
+}
+
+@keyframes dbzCenterPulse {
+  0% { transform: scale(0.97); box-shadow: 0 0 35px rgba(255, 214, 0, 0.75), 0 0 15px #00E5FF; }
+  100% { transform: scale(1.05); box-shadow: 0 0 65px rgba(255, 234, 0, 1), 0 0 35px #00E5FF; }
+}
+
+.mega-center-header {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  color: #00E5FF;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+  margin-bottom: 6px;
+}
+
+.mega-center-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #FFEA00;
+  text-shadow: 0 3px 0 #BF360C, 0 0 20px rgba(255, 234, 0, 0.9);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.mega-center-desc {
+  font-size: 16px;
+  font-weight: 700;
+  color: #E0E0E0;
+  margin-bottom: 18px;
+}
+
+.btn-mega-center-activate {
+  width: 100%;
+  min-height: 64px;
+  background: linear-gradient(135deg, #FF1744, #FF9100, #FFEA00);
+  border: 4px solid #FFFFFF;
+  border-radius: 20px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #BF360C, 0 10px 25px rgba(255, 23, 68, 0.6);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: megaButtonBounce 0.6s infinite alternate;
+}
+
+@keyframes megaButtonBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+.btn-mega-center-activate:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #BF360C;
+}
+
+@keyframes megaPulse {
+  from { transform: scale(0.97); }
+  to   { transform: scale(1.06); }
+}
+
+@keyframes turboPulse {
+  from { transform: translate(-50%, -50%) scale(0.96); }
+  to   { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* Train & Bridge Sequence Visual Row */
+.sequence-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 18px;
+  border: 3px dashed #80D8FF;
+  flex-wrap: wrap;
+}
+
+.seq-node {
+  min-width: 76px;
+  min-height: 56px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: #0288D1;
+  border: 3px solid #FFFFFF;
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seq-node.missing {
+  background: #FFD600;
+  color: #D50000;
+  border-color: #FF3D00;
+  animation: seqBlink 0.7s infinite alternate;
+}
+
+@keyframes seqBlink {
+  from { transform: scale(0.96); }
+  to   { transform: scale(1.06); }
+}
+
+/* Power Comparison Visual Bar inside Number Card */
+.power-bar-track {
+  width: 110px;
+  height: 11px;
+  background: #CFD8DC;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 2px solid #0277BD;
+}
+
+.power-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00E676, #FFEA00, #FF3D00);
+}
+
+/* Pro Shop Sections */
+.shop-section-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #80D8FF;
+  text-align: left;
+  margin: 12px 0 6px 0;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 10px;
+}
+
+.shop-card-btn {
+  min-height: 90px;
+  padding: 8px 10px;
+  border-radius: 18px;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 0.12s ease;
+}
+
+.shop-card-btn.equipped {
+  border-color: #00E676;
+  background: rgba(0, 230, 118, 0.2);
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.5);
+}
+
+.shop-card-btn.unlocked:not(.equipped) {
+  border-color: #FFD600;
+}
+
+/* ============================================================================
+   MAIN MENU OVERLAY SCREEN (INSIDE #game-stage)
+   ============================================================================ */
+.main-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: radial-gradient(circle at 50% 25%, rgba(25, 65, 110, 0.9), rgba(8, 18, 32, 0.96));
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.main-menu-backdrop.hidden {
+  display: none !important;
+}
+
+.main-menu-shell {
+  width: min(96%, 980px);
+  max-height: 96%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: linear-gradient(180deg, #152C4A 0%, #0B192C 100%);
+  border: 5px solid #FFD600;
+  border-radius: 32px;
+  padding: 18px 26px;
+  text-align: center;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.8);
+}
+
+.menu-hero-title {
+  font-size: 40px;
+  font-weight: 900;
+  color: #FFD600;
+  margin: 0 0 4px 0;
+  text-shadow: 0 4px 0 #BF360C, 0 8px 18px rgba(0,0,0,0.6);
+}
+
+.menu-hero-subtitle {
+  font-size: 18px;
+  color: #B3E5FC;
+  margin: 0 0 12px 0;
+  font-weight: 800;
+}
+
+.menu-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.menu-mode-card {
+  min-height: 148px;
+  padding: 14px 14px;
+  border-radius: 24px;
+  border: 4px solid #FFFFFF;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s;
+}
+
+.menu-mode-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.menu-mode-card.mode-courses {
+  background: linear-gradient(180deg, #00E676, #00A152);
+  box-shadow: 0 7px 0 #1B5E20, 0 10px 20px rgba(0,0,0,0.45);
+}
+
+.menu-mode-card.mode-range {
+  background: linear-gradient(180deg, #FF6D00, #D84315);
+  box-shadow: 0 7px 0 #870000, 0 10px 20px rgba(0,0,0,0.45);
+}
+
+.menu-mode-card.mode-minigolf {
+  background: linear-gradient(180deg, #AA00FF, #6A1B9A);
+  box-shadow: 0 7px 0 #38006B, 0 10px 20px rgba(0,0,0,0.45);
+}
+
+.menu-mode-card.mode-calculator {
+  background: linear-gradient(180deg, #00B0FF, #00838F);
+  box-shadow: 0 7px 0 #004D40, 0 10px 20px rgba(0,0,0,0.45);
+}
+
+.menu-mode-card .m-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.menu-mode-card .m-title {
+  font-size: 22px;
+  font-weight: 900;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+}
+
+.menu-mode-card .m-desc {
+  font-size: 13px;
+  color: #FFF9C4;
+  font-weight: 700;
+}
+
+.menu-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Difficulty / Age Level Selector Bar on Main Menu */
+.difficulty-selector-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 3px solid rgba(255, 214, 0, 0.55);
+  border-radius: 20px;
+  padding: 8px 14px;
+  margin: 0 auto 14px auto;
+  flex-wrap: wrap;
+}
+
+.difficulty-label {
+  font-size: 16px;
+  font-weight: 900;
+  color: #FFF59D;
+  margin-right: 4px;
+}
+
+.diff-pill-btn {
+  min-height: 46px;
+  padding: 6px 16px;
+  border-radius: 14px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #E1F5FE;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s, border-color 0.12s;
+}
+
+.diff-pill-btn.active {
+  background: linear-gradient(180deg, #FFD600, #FFA000);
+  color: #0D1B2A;
+  border-color: #FFFFFF;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.5);
+}
+
+/* Mini-Golf Leaderboard Styles */
+.leaderboard-summary-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(170, 0, 255, 0.2);
+  border: 3px solid #EA80FC;
+  border-radius: 20px;
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lb-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lb-stat-label {
+  font-size: 12px;
+  color: #E1BEE7;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.lb-stat-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FFD600;
+}
+
+.minigolf-holes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 10px 0 14px 0;
+}
+
+.mg-hole-best-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 3px solid rgba(128, 216, 255, 0.4);
+  border-radius: 16px;
+  padding: 10px 12px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mg-hole-best-card.recorded {
+  border-color: #00E676;
+  background: rgba(0, 230, 118, 0.12);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 14px 0;
+  font-size: 16px;
+}
+
+.leaderboard-table th {
+  background: rgba(255, 214, 0, 0.18);
+  color: #FFD600;
+  padding: 8px 10px;
+  font-weight: 900;
+  border-bottom: 3px solid #FFD600;
+}
+
+.leaderboard-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.phone-url-box {
+  background: #07111E;
+  border: 4px dashed #00E676;
+  border-radius: 20px;
+  padding: 14px 20px;
+  margin: 12px auto;
+  font-family: monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: #00E676;
+  user-select: all;
+}
+
+/* ============================================================================
+   PORTRAIT MODE VIRTUAL STAGE (.is-portrait ON #game-stage: 720 x 1180..1450)
+   Stacks Top HUD -> 16:10 Golf Canvas Window -> Bottom Math Deck with ZERO overlap!
+   ============================================================================ */
+#game-stage.is-portrait #app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+}
+
+#game-stage.is-portrait .gameplay-hud {
+  top: 8px;
+  left: 10px;
+  right: 10px;
+}
+
+#game-stage.is-portrait .gameplay-back-btn {
+  min-height: 46px;
+  padding: 6px 14px;
+  font-size: 16px;
+}
+
+#game-stage.is-portrait .gameplay-audio-btn {
+  min-height: 46px;
+  padding: 6px 14px;
+  font-size: 15px;
+}
+
+/* ============================================================================
+   EDUCATIONAL GOLF SCORING CARD (CELEBRATION MODAL)
+   ============================================================================ */
+.cel-score-card {
+  margin: 12px auto;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(10, 24, 42, 0.9);
+  border: 3px solid #4FC3F7;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.cel-score-badge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
+
+.cel-score-badge.hole_in_one {
+  background: linear-gradient(135deg, #E040FB, #7C4DFF);
+  border-color: #FFD600;
+  box-shadow: 0 0 16px rgba(224, 64, 251, 0.6);
+}
+
+.cel-score-badge.albatross {
+  background: linear-gradient(135deg, #00E5FF, #00B0FF);
+  border-color: #FFF59D;
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+}
+
+.cel-score-badge.eagle {
+  background: linear-gradient(135deg, #FFD600, #FF6F00);
+  border-color: #FFFFFF;
+  color: #0D1B2A;
+  box-shadow: 0 0 16px rgba(255, 214, 0, 0.6);
+}
+
+.cel-score-badge.birdie {
+  background: linear-gradient(135deg, #00E676, #00B0FF);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.5);
+}
+
+.cel-score-badge.par {
+  background: linear-gradient(135deg, #4FC3F7, #0288D1);
+  border-color: #FFF59D;
+}
+
+.cel-score-badge.bogey {
+  background: linear-gradient(135deg, #FFA726, #FB8C00);
+  border-color: #FFE082;
+}
+
+.cel-score-badge.double_bogey {
+  background: linear-gradient(135deg, #FF7043, #F4511E);
+  border-color: #FFCCBC;
+}
+
+.cel-score-badge.triple_bogey {
+  background: linear-gradient(135deg, #EF5350, #D32F2F);
+  border-color: #FFCDD2;
+}
+
+.cel-score-math-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cel-math-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.cel-math-box.result-box {
+  background: rgba(255, 214, 0, 0.16);
+  border-color: #FFD600;
+}
+
+.cel-math-num {
+  font-size: 26px;
+  font-weight: 900;
+  color: #FFF59D;
+  font-family: var(--font-display);
+}
+
+.cel-math-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  color: #81D4FA;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cel-math-op {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+
+.cel-score-explanation {
+  font-size: 17px;
+  font-weight: 700;
+  color: #E0E0E0;
+  text-align: center;
+  line-height: 1.35;
+}
+
+/* Full-Screen Canvas in Portrait so Animations Fill 100% of the Screen! */
+#game-stage.is-portrait .canvas-viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: none;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+#game-stage.is-portrait .math-deck {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96%;
+  margin: 0;
+  padding: 8px 10px 12px 10px;
+  gap: 6px;
+  flex-shrink: 0;
+  background: rgba(12, 25, 42, 0.92);
+}
+
+#game-stage.is-portrait .math-deck.faded-out {
+  transform: translate(-50%, 120%);
+}
+
+#game-stage.is-portrait .prompt-title {
+  font-size: 22px;
+}
+
+#game-stage.is-portrait .number-card {
+  min-width: 185px;
+  min-height: 88px;
+  font-size: 38px;
+}
+
+#game-stage.is-portrait .base10-card {
+  min-width: 92px;
+  min-height: 74px;
+  font-size: 28px;
+}
+
+#game-stage.is-portrait .stone-block-btn {
+  min-width: 92px;
+  min-height: 76px;
+  font-size: 25px;
+}
+
+#game-stage.is-portrait .aim-lane-btn {
+  min-width: 130px;
+  min-height: 46px;
+  font-size: 15px;
+}
+
+/* Main Menu & Modals inside Portrait Stage (720px wide) */
+#game-stage.is-portrait .main-menu-shell {
+  width: 96%;
+  padding: 20px 18px;
+}
+
+#game-stage.is-portrait .menu-hero-title {
+  font-size: 34px;
+}
+
+#game-stage.is-portrait .menu-modes-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+#game-stage.is-portrait .menu-mode-card {
+  min-height: 118px;
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 14px 20px;
+  gap: 16px;
+}
+
+#game-stage.is-portrait .menu-mode-card .m-icon {
+  font-size: 52px;
+}
+
+#game-stage.is-portrait .course-grid {
+  grid-template-columns: 1fr;
+}
+
+#game-stage.is-portrait .minigolf-holes-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+#game-stage.is-portrait .modal-card {
+  width: 96%;
+  padding: 18px 18px;
+}
+
+#game-stage.is-portrait .calculator-shell {
+  width: 98%;
+  height: 98%;
+  max-height: 98%;
+  padding: 10px 12px;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+#game-stage.is-portrait .calc-top-bar {
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+#game-stage.is-portrait .calc-title {
+  font-size: 22px;
+  text-align: center;
+}
+
+#game-stage.is-portrait .calc-effects-bar {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#game-stage.is-portrait .calc-body-grid {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+#game-stage.is-portrait .calc-stage {
+  height: 110px;
+  min-height: 90px;
+}
+
+#game-stage.is-portrait .calc-lcd-value {
+  font-size: 48px;
+}
+
+#game-stage.is-portrait .calc-key {
+  min-height: 56px;
+  font-size: 30px;
+}
+
+/* ============================================================================
+   STEP-1 AIM SELECTION CARDS (BEFORE EQUATION ON TEE & FAIRWAY SHOTS)
+   ============================================================================ */
+.aim-step-grid {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.aim-choice-card {
+  flex: 1 1 190px;
+  max-width: 280px;
+  min-height: 98px;
+  padding: 10px 14px;
+  border-radius: 22px;
+  border: 4px solid #00E5FF;
+  background: linear-gradient(180deg, #0D2B4E 0%, #071930 100%);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 7px 0 #041020, 0 8px 18px rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s ease, border-color 0.12s, background 0.12s;
+}
+
+.aim-choice-card:active {
+  transform: translateY(4px) scale(0.97);
+}
+
+.aim-choice-card.has-bonus {
+  border-color: #FFD600;
+  background: linear-gradient(180deg, #1E3C72 0%, #0F2042 100%);
+  box-shadow: 0 7px 0 #0A152C, 0 0 18px rgba(255, 214, 0, 0.45);
+}
+
+.aim-choice-card .aim-dir-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+
+.aim-choice-card .aim-bonus-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  background: rgba(255, 214, 0, 0.22);
+  color: #FFEA00;
+  border: 2px solid #FFD600;
+}
+
+.aim-choice-card .aim-fairway-pill {
+  font-size: 14px;
+  font-weight: 800;
+  color: #80D8FF;
+}
+
+/* ============================================================================
+   MINI-GOLF BALL COLOR & CLUB COLOR PICKER MODAL
+   ============================================================================ */
+.gear-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 12px 20px;
+  margin: 8px 0 12px 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid #FFD600;
+  flex-wrap: wrap;
+}
+
+.gear-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #FFF59D;
+}
+
+.gear-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#game-stage.is-portrait .gear-swatch-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.color-swatch-btn {
+  min-height: 68px;
+  padding: 8px 10px;
+  border-radius: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.09);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  transition: transform 0.12s ease, border-color 0.12s, background 0.12s;
+}
+
+.color-swatch-btn.selected {
+  border-color: #FFD600;
+  background: rgba(255, 214, 0, 0.24);
+  transform: scale(1.03);
+  box-shadow: 0 0 14px rgba(255, 214, 0, 0.55);
+}
+
+.color-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid #FFFFFF;
+  flex-shrink: 0;
+  box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================================================
+   TALKING CALCULATOR MODAL & STAGE — SCREEN-FILLING & EXTRA-LARGE TOUCH TARGETS
+   ============================================================================ */
+.calculator-shell {
+  width: min(98%, 1240px);
+  max-height: 98%;
+  height: 96%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: linear-gradient(180deg, #07221E 0%, #031412 100%);
+  border: 5px solid #00E676;
+  border-radius: 28px;
+  padding: 10px 18px;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 230, 118, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+/* Compact Calculator Header Bar */
+.calc-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.calc-back-btn {
+  min-height: 48px;
+  padding: 8px 18px;
+  border-radius: 16px;
+  border: 3px solid #FFFFFF;
+  background: linear-gradient(180deg, #455A64, #263238);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #102027;
+  transition: transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.calc-back-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #102027;
+}
+
+.calc-title-box {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.calc-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #00E676;
+  text-shadow: 0 3px 0 #004D40, 0 0 16px rgba(0, 230, 118, 0.6);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Celebration Effect Picker Bar */
+.calc-effects-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px 12px;
+  border-radius: 18px;
+  border: 2px solid rgba(0, 230, 118, 0.35);
+  flex-shrink: 0;
+}
+
+.calc-effects-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD600;
+  letter-spacing: 1px;
+}
+
+.calc-effects-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.calc-effect-pill {
+  min-height: 38px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: #E0E0E0;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calc-effect-pill.active {
+  background: linear-gradient(135deg, #00E676, #00B0FF);
+  border-color: #FFFFFF;
+  color: #0D1B2A;
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.8);
+  transform: scale(1.04);
+}
+
+/* 2-Column Responsive Landscape Grid */
+.calc-body-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 14px;
+  width: 100%;
+  flex-grow: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.calc-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+.calc-right-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Celebration Stage */
+.calc-stage {
+  position: relative;
+  flex-grow: 1;
+  min-height: 110px;
+  height: 150px;
+  border-radius: 20px;
+  background: radial-gradient(ellipse at bottom, #003830 0%, #011815 100%);
+  border: 4px solid #00E5FF;
+  box-shadow: inset 0 4px 18px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.35);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-stage-banner {
+  position: absolute;
+  top: 8px;
+  z-index: 20;
+  background: rgba(13, 27, 42, 0.94);
+  border: 3px solid #FFD600;
+  border-radius: 999px;
+  padding: 4px 20px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 900;
+  color: #FFEA00;
+  box-shadow: 0 0 20px rgba(255, 214, 0, 0.7);
+  animation: bannerPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.calc-stage-banner.hidden {
+  display: none !important;
+}
+
+@keyframes bannerPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.calc-sprites-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Numbered Counting Sprites */
+.calc-numbered-sprite {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.calc-item-graphic {
+  font-size: 46px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.calc-item-badge {
+  background: linear-gradient(135deg, #FFD600, #FF9100);
+  color: #0D1B2A;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  border: 2px solid #FFFFFF;
+  border-radius: 999px;
+  padding: 1px 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  margin-top: -5px;
+}
+
+/* Extra-Large High-Contrast Scoreboard LCD Screen */
+.calc-lcd-screen {
+  background: #031311;
+  border: 4px solid #37474F;
+  border-radius: 20px;
+  padding: 8px 18px;
+  box-shadow: inset 0 8px 18px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 230, 118, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.calc-lcd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calc-lcd-history {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 20px;
+  font-weight: 900;
+  color: #80CBC4;
+  letter-spacing: 2px;
+  min-height: 26px;
+}
+
+.calc-lcd-voice {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+  color: #00E676;
+}
+
+.calc-lcd-main {
+  text-align: right;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.calc-lcd-value {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 900;
+  color: #FFEA00;
+  text-shadow: 0 0 18px rgba(255, 234, 0, 0.65);
+  letter-spacing: 2px;
+  line-height: 1.05;
+}
+
+.calc-equation-caption {
+  font-size: 16px;
+  font-weight: 800;
+  color: #B2DFDB;
+  text-align: center;
+  border-top: 2px dashed rgba(255, 255, 255, 0.2);
+  padding-top: 4px;
+}
+
+/* Keypad Grid & Chunky Arcade Buttons */
+.calc-keypad-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+.calc-ops-row {
+  display: flex;
+  gap: 8px;
+  justify-content: stretch;
+}
+
+.calc-ops-row .calc-key {
+  flex: 1;
+}
+
+.calc-digits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.calc-key {
+  min-height: 56px;
+  border-radius: 18px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.calc-key:active {
+  transform: translateY(4px);
+  box-shadow: none !important;
+}
+
+.calc-key.key-clear {
+  background: linear-gradient(180deg, #FF5252, #D32F2F);
+  border: 3px solid #FFCDD2;
+  color: #FFFFFF;
+  box-shadow: 0 5px 0 #B71C1C;
+  font-size: 28px;
+}
+
+.calc-key.key-backspace {
+  background: linear-gradient(180deg, #FF9800, #F57C00);
+  border: 3px solid #FFE082;
+  color: #FFFFFF;
+  box-shadow: 0 5px 0 #E65100;
+  font-size: 28px;
+}
+
+.calc-key.key-op {
+  background: linear-gradient(180deg, #00B0FF, #0288D1);
+  border: 3px solid #B3E5FC;
+  color: #FFFFFF;
+  box-shadow: 0 5px 0 #01579B;
+  font-size: 30px;
+}
+
+.calc-key.key-advanced-op {
+  background: linear-gradient(180deg, #7C4DFF, #512DA8);
+  border: 3px solid #D1C4E9;
+  box-shadow: 0 5px 0 #311B92;
+  font-size: 30px;
+}
+
+.calc-key.key-advanced-op.hidden {
+  display: none !important;
+}
+
+.calc-key.key-num {
+  background: linear-gradient(180deg, #26A69A, #00796B);
+  border: 3px solid #FFFFFF;
+  color: #FFFFFF;
+  box-shadow: 0 5px 0 #004D40;
+  font-size: 36px;
+}
+
+.calc-key.key-zero {
+  grid-column: span 1;
+}
+
+.calc-key.key-equals {
+  grid-column: span 2;
+  background: linear-gradient(180deg, #00E676, #00A152);
+  border: 3px solid #FFD600;
+  color: #0D1B2A;
+  box-shadow: 0 6px 0 #1B5E20, 0 0 20px rgba(0, 230, 118, 0.7);
+  font-size: 28px;
+}
+
+/* Slower, Smooth Counting Parade Keyframes (5.5s to 6.2s across screen!) */
+.calc-car-sprite {
+  animation: carDriveAcrossSlow 5.5s linear forwards;
+}
+
+/* Flip car graphic so headlights and hood face FORWARD in direction of motion! */
+.calc-car-sprite .calc-item-graphic {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+
+@keyframes carDriveAcrossSlow {
+  0% {
+    transform: translateX(-120px) scale(0.95);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(1300px) scale(1.05);
+    opacity: 0;
+  }
+}
+
+.calc-ball-sprite {
+  animation: ballBounceAcrossSlow 6.0s ease-in-out forwards;
+}
+
+@keyframes ballBounceAcrossSlow {
+  0% {
+    transform: translate(-100px, 40px) scale(0.8);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(260px, -20px) scale(1.1);
+  }
+  50% {
+    transform: translate(620px, 35px) scale(0.9);
+  }
+  75% {
+    transform: translate(960px, -15px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(1300px, 40px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.calc-dino-sprite {
+  animation: dinoStompAcrossSlow 6.2s linear forwards;
+}
+
+@keyframes dinoStompAcrossSlow {
+  0% {
+    transform: translateX(-110px) rotate(-6deg);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  20% {
+    transform: translateX(220px) rotate(6deg);
+  }
+  40% {
+    transform: translateX(520px) rotate(-6deg);
+  }
+  60% {
+    transform: translateX(820px) rotate(6deg);
+  }
+  80% {
+    transform: translateX(1080px) rotate(-6deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(1320px) rotate(6deg);
+    opacity: 0;
+  }
+}
+
+.calc-pizza-sprite {
+  animation: pizzaFlyAcrossSlow 5.8s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
+@keyframes pizzaFlyAcrossSlow {
+  0% {
+    transform: translate(-110px, 30px) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(580px, -25px) rotate(360deg) scale(1.15);
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(1300px, 20px) rotate(720deg) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* ============================================================================
+   GIANT SINGLE HERO RESULT (FOR NUMBERS > 100)
+   ============================================================================ */
+.calc-giant-hero {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: heroPopIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  pointer-events: none;
+}
+
+.calc-giant-hero-bob {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: heroBob 1.6s infinite alternate ease-in-out;
+}
+
+.calc-giant-hero-graphic {
+  font-size: 76px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75));
+  display: inline-block;
+}
+
+.calc-giant-hero-graphic.flip-car {
+  transform: scaleX(-1);
+}
+
+.calc-giant-hero-number {
+  font-family: var(--font-display);
+  font-size: 54px;
+  font-weight: 900;
+  color: #FFEA00;
+  text-shadow: 0 4px 0 #BF360C, 0 0 24px rgba(255, 234, 0, 0.85);
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.22), rgba(0, 230, 118, 0.22));
+  border: 4px solid #FFD600;
+  border-radius: 24px;
+  padding: 6px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+}
+
+#game-stage.is-portrait .calc-giant-hero {
+  gap: 12px;
+}
+
+#game-stage.is-portrait .calc-giant-hero-graphic {
+  font-size: 60px;
+}
+
+#game-stage.is-portrait .calc-giant-hero-number {
+  font-size: 42px;
+  padding: 4px 18px;
+}
+
+@keyframes heroPopIn {
+  0% { transform: scale(0.35); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes heroBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}

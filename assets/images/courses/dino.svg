@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  <defs>
+    <linearGradient id="dinoSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF7043"/>
+      <stop offset="55%" stop-color="#FFAB91"/>
+      <stop offset="100%" stop-color="#FFF3E0"/>
+    </linearGradient>
+    <linearGradient id="dinoTurf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8BC34A"/>
+      <stop offset="60%" stop-color="#558B2F"/>
+      <stop offset="100%" stop-color="#33691E"/>
+    </linearGradient>
+  </defs>
+  <!-- Prehistoric Sunset Sky -->
+  <rect width="1280" height="420" fill="url(#dinoSky)"/>
+  <!-- Smoking Volcano in Background -->
+  <polygon points="820,400 980,150 1060,150 1220,400" fill="#5D4037"/>
+  <polygon points="980,150 1020,210 1060,150" fill="#FF3D00"/>
+  <circle cx="1010" cy="110" r="35" fill="#78909C" opacity="0.7"/>
+  <circle cx="1045" cy="80" r="48" fill="#90A4AE" opacity="0.6"/>
+  <!-- Prehistoric Ferns & Hills -->
+  <path d="M0 400 Q 320 330 640 390 T 1280 390 L 1280 800 L 0 800 Z" fill="url(#dinoTurf)"/>
+  <path d="M500 395 L 780 395 L 1060 800 L 220 800 Z" fill="#9CCC65" opacity="0.6"/>
+  <!-- T-Rex Ribcage Fossil Arch -->
+  <g stroke="#F5F5DC" stroke-width="14" fill="none" stroke-linecap="round">
+    <path d="M180 520 Q 250 400 320 520"/>
+    <path d="M205 500 Q 265 400 335 500"/>
+    <path d="M230 480 Q 280 400 350 480"/>
+  </g>
+  <!-- Slapstick Hazard 1: Sleeping Pterodactyl Nest (Left) -->
+  <ellipse cx="230" cy="590" rx="80" ry="34" fill="#8D6E63" stroke="#5D4037" stroke-width="6"/>
+  <ellipse cx="215" cy="575" rx="22" ry="30" fill="#FFF9C4" stroke="#BCAAA4" stroke-width="3"/>
+  <ellipse cx="250" cy="578" rx="20" ry="27" fill="#FFF9C4" stroke="#BCAAA4" stroke-width="3"/>
+  <!-- Slapstick Hazard 2: Bubbling Lava Pool (Right) -->
+  <ellipse cx="1020" cy="585" rx="95" ry="38" fill="#3E2723"/>
+  <ellipse cx="1020" cy="585" rx="82" ry="28" fill="#FF3D00"/>
+  <circle cx="995" cy="580" r="10" fill="#FFEA00"/>
+  <circle cx="1045" cy="588" r="14" fill="#FF9100"/>
+</svg>

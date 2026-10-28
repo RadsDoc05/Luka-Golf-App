@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  <defs>
+    <linearGradient id="drSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#311B92"/>
+      <stop offset="38%" stop-color="#E65100"/>
+      <stop offset="75%" stop-color="#FFB74D"/>
+      <stop offset="100%" stop-color="#FFF8E1"/>
+    </linearGradient>
+    <linearGradient id="drTurf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7CB342"/>
+      <stop offset="45%" stop-color="#43A047"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </linearGradient>
+  </defs>
+  <!-- Dramatic Canyon Sunset Sky -->
+  <rect width="1280" height="410" fill="url(#drSky)"/>
+  <!-- Glowing Sun -->
+  <circle cx="260" cy="150" r="62" fill="#FFF176" opacity="0.9"/>
+  <!-- Scenic Grand Canyon Layered Red Rock Mesas -->
+  <polygon points="0,410 0,240 160,240 240,330 430,330 510,410" fill="#BF360C"/>
+  <polygon points="120,410 190,275 360,275 440,410" fill="#D84315"/>
+  <polygon points="840,410 920,250 1140,250 1210,330 1280,330 1280,410" fill="#BF360C"/>
+  <!-- Center-Right Majestic Volcano in the Canyon Background -->
+  <polygon points="490,410 640,145 740,145 890,410" fill="#4E342E" stroke="#3E2723" stroke-width="4"/>
+  <!-- Glowing Lava Crater & Magma Streams -->
+  <ellipse cx="690" cy="145" rx="50" ry="14" fill="#FF3D00"/>
+  <path d="M665 152 Q 680 220 655 280" fill="none" stroke="#FF6D00" stroke-width="10" stroke-linecap="round"/>
+  <path d="M710 154 Q 725 210 740 260" fill="none" stroke="#FFEA00" stroke-width="7" stroke-linecap="round"/>
+  <!-- Canyon Gorge Rim -->
+  <rect y="395" width="1280" height="22" fill="#8D6E63"/>
+  <!-- Expansive Driving Range Turf -->
+  <path d="M0 410 L 1280 410 L 1280 800 L 0 800 Z" fill="url(#drTurf)"/>
+  <!-- Perspective Yardage Arc Lines on Range -->
+  <g stroke="rgba(255,255,255,0.32)" stroke-width="3" fill="none" stroke-dasharray="14 10">
+    <path d="M350 455 Q 640 435 930 455"/>
+    <path d="M260 510 Q 640 485 1020 510"/>
+    <path d="M160 575 Q 640 545 1120 575"/>
+  </g>
+  <!-- Desert Saguaro Cacti on Left & Right -->
+  <g stroke="#2E7D32" stroke-width="14" stroke-linecap="round" fill="none">
+    <line x1="105" y1="530" x2="105" y2="415"/>
+    <path d="M105 465 L 78 465 L 78 435"/>
+    <path d="M105 480 L 132 480 L 132 445"/>
+    <line x1="1175" y1="540" x2="1175" y2="425"/>
+    <path d="M1175 475 L 1148 475 L 1148 445"/>
+  </g>
+</svg>

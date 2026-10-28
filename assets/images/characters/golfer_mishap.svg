@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <!-- Shadow -->
+  <ellipse cx="120" cy="295" rx="65" ry="16" fill="rgba(0,0,0,0.28)"/>
+  <!-- Cartoon Spin Tornado Lines -->
+  <ellipse cx="120" cy="180" rx="85" ry="25" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-dasharray="18 10"/>
+  <ellipse cx="120" cy="230" rx="70" ry="20" fill="none" stroke="#FFEE58" stroke-width="5" stroke-dasharray="14 8"/>
+  <!-- Tangled Legs -->
+  <path d="M105 220 L 145 280 M 135 220 L 95 280" stroke="#FFCCBC" stroke-width="18" stroke-linecap="round"/>
+  <ellipse cx="90" cy="285" rx="22" ry="11" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <ellipse cx="150" cy="285" rx="22" ry="11" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <!-- Shorts & Twisted Torso -->
+  <rect x="80" y="185" width="80" height="45" rx="10" fill="#FFF59D" stroke="#263238" stroke-width="4"/>
+  <rect x="75" y="110" width="90" height="82" rx="20" fill="#29B6F6" stroke="#263238" stroke-width="4"/>
+  <rect x="77" y="140" width="86" height="16" fill="#FFEE58"/>
+  <!-- Bent Rubber-Like Golf Club -->
+  <path d="M165 150 Q 225 180 195 260" fill="none" stroke="#B0BEC5" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="195" cy="265" rx="16" ry="9" fill="#37474F" stroke="#263238" stroke-width="3"/>
+  <!-- Dizzy Face Facing Backward with Spiral Eyes & Stars -->
+  <circle cx="120" cy="72" r="38" fill="#FFCCBC" stroke="#263238" stroke-width="4"/>
+  <circle cx="106" cy="72" r="9" fill="#FFFFFF" stroke="#263238" stroke-width="3"/>
+  <circle cx="134" cy="72" r="9" fill="#FFFFFF" stroke="#263238" stroke-width="3"/>
+  <circle cx="104" cy="70" r="4" fill="#263238"/>
+  <circle cx="136" cy="74" r="4" fill="#263238"/>
+  <path d="M108 92 Q 120 82 132 92" fill="none" stroke="#263238" stroke-width="4" stroke-linecap="round"/>
+  <!-- Floating Cartoon Stars & Popped Hat -->
+  <path d="M75 30 Q 120 -5 165 30 Z" fill="#FF5252" stroke="#263238" stroke-width="4"/>
+  <polygon points="55,45 60,55 70,55 62,62 65,72 55,66 45,72 48,62 40,55 50,55" fill="#FFEA00" stroke="#F57F17" stroke-width="2"/>
+  <polygon points="185,40 190,50 200,50 192,57 195,67 185,61 175,67 178,57 170,50 180,50" fill="#FFEA00" stroke="#F57F17" stroke-width="2"/>
+</svg>

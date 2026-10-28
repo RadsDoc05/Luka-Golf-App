@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <!-- Shadow -->
+  <ellipse cx="120" cy="295" rx="65" ry="16" fill="rgba(0,0,0,0.28)"/>
+  <!-- Shoes -->
+  <ellipse cx="95" cy="285" rx="22" ry="11" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <ellipse cx="145" cy="285" rx="22" ry="11" fill="#FFFFFF" stroke="#263238" stroke-width="4"/>
+  <!-- Legs / Khaki Shorts -->
+  <rect x="86" y="220" width="20" height="62" rx="8" fill="#FFCCBC" stroke="#263238" stroke-width="3"/>
+  <rect x="134" y="220" width="20" height="62" rx="8" fill="#FFCCBC" stroke="#263238" stroke-width="3"/>
+  <rect x="80" y="185" width="80" height="45" rx="10" fill="#FFF59D" stroke="#263238" stroke-width="4"/>
+  <!-- Striped Golf Polo (Behind-the-golfer 3/4 view) -->
+  <rect x="75" y="110" width="90" height="82" rx="20" fill="#29B6F6" stroke="#263238" stroke-width="4"/>
+  <rect x="77" y="140" width="86" height="16" fill="#FFEE58"/>
+  <!-- Arms Holding Club Ready -->
+  <path d="M155 125 L 185 165 L 165 190" fill="none" stroke="#FFCCBC" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Golf Club Addressing Ball -->
+  <line x1="168" y1="185" x2="210" y2="285" stroke="#B0BEC5" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="215" cy="287" rx="16" ry="8" fill="#37474F" stroke="#263238" stroke-width="3"/>
+  <!-- Head & Golf Visor Cap -->
+  <circle cx="120" cy="72" r="38" fill="#FFCCBC" stroke="#263238" stroke-width="4"/>
+  <path d="M82 65 Q 120 25 158 65 Z" fill="#FF5252" stroke="#263238" stroke-width="4"/>
+  <path d="M120 55 L 175 62 L 155 72 Z" fill="#D32F2F" stroke="#263238" stroke-width="3"/>
+  <circle cx="120" cy="36" r="7" fill="#FFFFFF" stroke="#263238" stroke-width="3"/>
+</svg>

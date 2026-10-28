@@ -1,0 +1,2936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D1B2A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Luka's 18-Hole Golf Adventure</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="../assets/images/ui/trophy_cup.svg" />
+  <link rel="apple-touch-icon" href="../assets/images/ui/trophy_cup.svg" />
+  <link rel="stylesheet" href="./styles.css?v=20261028_4" />
+</head>
+<body>
+  <div id="viewport-root">
+    <div id="game-stage">
+      <div id="app-shell">
+        <!-- SLEEK FLOATING GAMEPLAY HUD: CLEAN BACK TO MENU ARROW & AUDIO BUTTON -->
+        <header class="gameplay-hud" id="gameplay-hud">
+          <button id="btn-back-to-menu" class="gameplay-back-btn" type="button" aria-label="Return to Main Menu">
+            <span class="back-arrow">⬅️</span>
+            <span class="back-text">MENU</span>
+          </button>
+          <button id="btn-hear-prompt" class="gameplay-audio-btn" type="button" aria-label="Hear Math Prompt">
+            <span class="icon">🔊</span>
+            <span class="audio-text">HEAR IT</span>
+          </button>
+        </header>
+
+        <!-- MIDDLE CANVAS VIEWPORT (Full-bleed in Landscape, 16:10 Window in Portrait!) -->
+        <div id="canvas-viewport" class="canvas-viewport">
+          <canvas id="game-canvas" width="1280" height="800" aria-label="Luka Golf Course Canvas"></canvas>
+          <!-- Center Mega Power Drive Unlock Popup Modal -->
+          <div id="mega-center-popup" class="mega-center-popup hidden">
+            <div class="mega-center-card">
+              <div class="mega-center-header">⚡ SUPER SAIYAN POWER! ⚡</div>
+              <div class="mega-center-title">MEGA POWER UNLOCKED!</div>
+              <div class="mega-center-desc">Unleash the ultimate 550+ Yard Dragon Ball Z drive!</div>
+              <button id="btn-mega-center-activate" class="btn-mega-center-activate" type="button">
+                💥 UNLEASH MEGA DRIVE NOW! (550+ YDS) 💥
+              </button>
+            </div>
+          </div>
+          <!-- Centered In-Play Super Saiyan Active Badge -->
+          <div id="mega-active-indicator" class="mega-active-indicator hidden">
+            ⚡🔥 SUPER SAIYAN MEGA DRIVE ACTIVE! (550+ YDS) 🔥⚡
+          </div>
+          <button id="btn-turbo-boost" class="turbo-boost-btn hidden" type="button">
+            ⚡ TURBO BOOST! (+5 🪙)
+          </button>
+        </div>
+
+        <!-- BOTTOM CONCRETE MATH DECK (Auto-Fades Out During Shot Animations!) -->
+        <section class="math-deck" id="math-deck" aria-live="polite">
+          <!-- Live Game Status Chips Directly on Deck -->
+          <div class="deck-status-chips">
+            <span class="chip-pill chip-hole" id="hud-hole-label">⛳ HOLE 1 • PAR 3</span>
+            <span class="chip-pill chip-target" id="hud-target-pill"><span id="hud-target-label">TARGET:</span> <strong id="hud-target-value">120 YDS</strong></span>
+            <span class="chip-pill chip-strokes" id="hud-strokes-pill"><span id="hud-strokes-label">STROKES:</span> <strong id="hud-strokes-value">0</strong></span>
+            <span class="chip-pill chip-mega" id="hud-mega-pill"><span id="hud-mega-meter">⚡ MEGA: ⚪ ⚪ ⚪</span></span>
+            <span class="chip-pill chip-coins" id="hud-coins-pill"><span id="hud-coins-value">🪙 30</span></span>
+            <span class="sr-only" id="hud-course-name" style="display:none;">TROPICAL RESORT</span>
+          </div>
+
+          <!-- Fairway Aiming Lane Bar (18-Hole Course Mode) -->
+          <div class="aim-bar" id="aim-bar">
+            <button type="button" class="aim-lane-btn" data-lane="left" id="aim-btn-left">⬅️ AIM LEFT</button>
+            <button type="button" class="aim-lane-btn active" data-lane="center" id="aim-btn-center">⬆️ AIM CENTER</button>
+            <button type="button" class="aim-lane-btn" data-lane="right" id="aim-btn-right">➡️ AIM RIGHT</button>
+          </div>
+
+          <!-- Driving Range Mode Selector Bar -->
+          <div class="aim-bar hidden" id="range-mode-bar">
+            <button type="button" class="aim-lane-btn active" data-rmode="exact_3digit">🔢 3-Digit (234, 127)</button>
+            <button type="button" class="aim-lane-btn" data-rmode="place_value_3digit">🧱 Place Value</button>
+            <button type="button" class="aim-lane-btn" data-rmode="basic_math">🚀 Math Blaster</button>
+            <button type="button" class="aim-lane-btn" data-rmode="mix">🎲 Mix All</button>
+          </div>
+
+          <div class="prompt-banner">
+            <h1 class="prompt-title" id="math-prompt-title">🏌️ Tee Shot: Find the 120-Yard Driver!</h1>
+          </div>
+          <div class="math-workspace" id="math-workspace">
+            <!-- Dynamically populated by MathEngine -->
+          </div>
+        </section>
+      </div>
+
+  <!-- ========================================================================
+       MAIN MENU OVERLAY (SHOWN AT STARTUP & VIA 🏠 MENU BUTTON)
+       ======================================================================== -->
+  <div id="main-menu-overlay" class="main-menu-backdrop" role="dialog" aria-modal="true">
+    <div class="main-menu-shell">
+      <h1 class="menu-hero-title">⛳ LUKA'S GOLF ADVENTURE!</h1>
+      <p class="menu-hero-subtitle">Pick a Game Mode to Tee Off!</p>
+
+      <div class="menu-modes-grid">
+        <!-- 1. Full 18-Hole Golf Courses -->
+        <button id="menu-btn-courses" class="menu-mode-card mode-courses" type="button">
+          <span class="m-icon">🏝️</span>
+          <span class="m-title">18-HOLE COURSES</span>
+          <span class="m-desc">4 Themed Worlds: Tropical, Dino, Cyber & Canyon!</span>
+        </button>
+
+        <!-- 2. Canyon Volcano Driving Range -->
+        <button id="menu-btn-range" class="menu-mode-card mode-range" type="button">
+          <span class="m-icon">🌋</span>
+          <span class="m-title">DRIVING RANGE</span>
+          <span class="m-desc">3-Digit Targets (234, 127), Basic Math & Volcano Fireworks!</span>
+        </button>
+
+        <!-- 3. Wacky Mini-Golf Obstacle Course -->
+        <button id="menu-btn-minigolf" class="menu-mode-card mode-minigolf" type="button">
+          <span class="m-icon">🎡</span>
+          <span class="m-title">WACKY MINI-GOLF</span>
+          <span class="m-desc">Math Equations + Windmills, Tunnels, Dino Jaws & Cannons!</span>
+        </button>
+
+        <!-- 4. Dino-Golf Talking Calculator -->
+        <button id="menu-btn-calculator" class="menu-mode-card mode-calculator" type="button">
+          <span class="m-icon">🧮</span>
+          <span class="m-title">TALKING CALCULATOR</span>
+          <span class="m-desc">Speak Digits, Solve Equations & Celebrate with Racing Cars & Dinos!</span>
+        </button>
+      </div>
+
+      <div class="menu-bottom-row">
+        <button id="menu-btn-shop" class="big-cta-btn secondary" type="button" style="min-height:68px;min-width:195px;font-size:21px;padding:10px 20px;">
+          🛍️ PRO SHOP (<span id="menu-coins-label">🪙 30</span>)
+        </button>
+        <button id="menu-btn-trophies" class="big-cta-btn" type="button" style="min-height:68px;min-width:195px;font-size:21px;padding:10px 20px;">
+          🏆 TROPHY ROOM
+        </button>
+        <button id="menu-btn-leaderboard" class="big-cta-btn secondary" type="button" style="min-height:68px;min-width:205px;font-size:21px;padding:10px 20px;background:linear-gradient(180deg,#AA00FF,#6A1B9A);">
+          🏅 MINI-GOLF SCORES
+        </button>
+        <button id="menu-btn-fullscreen" class="big-cta-btn secondary" type="button" style="min-height:68px;min-width:165px;font-size:20px;padding:10px 18px;background:linear-gradient(180deg,#00BFA5,#00796B);">
+          ⛶ FULLSCREEN
+        </button>
+      </div>
+
+      <!-- Hidden Parental Gate on Main Menu: Hold for 3 Seconds for Settings -->
+      <div class="menu-parental-row">
+        <button id="parental-gate-trigger" class="brand-gate-btn" title="Parents: Hold 3 seconds for Settings" type="button">
+          <span>🔒 PARENT CONTROLS (HOLD 3s)</span>
+          <div id="gate-hold-bar" class="gate-hold-bar"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 1: CHEERFUL RESCUE SHOT PROMPT (SLAPSTICK MISHAP)
+       ======================================================================== -->
+  <div id="rescue-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title" id="rescue-headline">BONK! SPLASH!</h2>
+      <p class="modal-subtitle" id="rescue-text">
+        Bounced off a coconut tree right into the inflatable kiddie pool!
+      </p>
+      <button id="btn-rescue-retry" class="big-cta-btn" type="button">
+        🛟 RESCUE SHOT!
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: HOLE CELEBRATION & GOLF SCORING EDUCATION
+       ======================================================================== -->
+  <div id="celebration-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title" id="cel-headline">🐦 SWEET BIRDIE!</h2>
+      <p class="modal-subtitle" id="cel-subtext">You finished Hole 1 in 3 strokes!</p>
+
+      <!-- Educational Golf Scoring Math Card -->
+      <div id="cel-score-card" class="cel-score-card">
+        <div id="cel-score-badge" class="cel-score-badge birdie">BIRDIE • 1 UNDER PAR (-1)</div>
+        <div class="cel-score-math-row" id="cel-score-math">
+          <div class="cel-math-box">
+            <span class="cel-math-num" id="cel-math-strokes">3</span>
+            <span class="cel-math-lbl">STROKES</span>
+          </div>
+          <span class="cel-math-op">−</span>
+          <div class="cel-math-box">
+            <span class="cel-math-num" id="cel-math-par">4</span>
+            <span class="cel-math-lbl">PAR</span>
+          </div>
+          <span class="cel-math-op">=</span>
+          <div class="cel-math-box result-box" id="cel-math-resbox">
+            <span class="cel-math-num" id="cel-math-diff">-1</span>
+            <span class="cel-math-lbl" id="cel-math-name">BIRDIE</span>
+          </div>
+        </div>
+        <div class="cel-score-explanation" id="cel-score-explanation">
+          A Birdie is 1 stroke under par! Par was 4, you took 3!
+        </div>
+      </div>
+
+      <div id="cel-extra-info" style="margin: 14px 0; font-size: 22px; color: #FFF59D;"></div>
+      <button id="btn-next-hole" class="big-cta-btn" type="button">
+        ➡️ NEXT HOLE!
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: COURSE SELECT & STAR BADGES (GOLD / SILVER / BRONZE)
+       ======================================================================== -->
+  <div id="courses-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title">🗺️ CHOOSE YOUR GOLF COURSE</h2>
+      <p class="modal-subtitle">Win Gold (Under Par), Silver (Par), or Bronze (Completed) Stars!</p>
+      <div id="courses-grid" class="course-grid"></div>
+      <div style="margin-top: 14px;">
+        <button id="btn-play-full18" class="big-cta-btn secondary" type="button">
+          🌟 PLAY ALL 18 HOLES
+        </button>
+        <button id="btn-close-courses" class="big-cta-btn danger" type="button">
+          ✖ CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: TROPHY ROOM & SCORECARD OVERLAY
+       ======================================================================== -->
+  <div id="trophy-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title">🏆 LUKA'S TROPHY ROOM</h2>
+      <p class="modal-subtitle" id="trophy-stats-summary">Holes Completed: 0 • Holes in One: 0</p>
+      <div id="trophy-grid" class="trophy-grid"></div>
+      <div style="margin-top: 12px;">
+        <button id="btn-trophy-to-leaderboard" class="big-cta-btn" type="button" style="background:linear-gradient(180deg,#AA00FF,#6A1B9A);color:#FFF;">
+          🎡 MINI-GOLF LEADERBOARD
+        </button>
+        <button id="btn-close-trophies" class="big-cta-btn secondary" type="button">
+          ✖ CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4B: WACKY MINI-GOLF LEADERBOARD & PERSONAL BESTS
+       ======================================================================== -->
+  <div id="leaderboard-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title">🎡 MINI-GOLF LEADERBOARD</h2>
+      <p class="modal-subtitle">Luka's Best 6-Hole Carnival Rounds & Obstacle Records (Course Par: 12)</p>
+
+      <div class="leaderboard-summary-banner" id="mg-leaderboard-summary"></div>
+
+      <div class="shop-section-title">⛳ Best Score on Each Obstacle Hole (Tap Any Hole to Practice!)</div>
+      <div id="mg-holes-best-grid" class="minigolf-holes-grid"></div>
+
+      <div class="shop-section-title">🏅 Top 9-Hole Mini-Golf Rounds</div>
+      <div id="mg-top-rounds-container"></div>
+
+      <div style="margin-top: 14px;">
+        <button id="btn-play-minigolf-from-lb" class="big-cta-btn" type="button">
+          🎡 PLAY MINI-GOLF NOW!
+        </button>
+        <button id="btn-close-leaderboard" class="big-cta-btn secondary" type="button">
+          ✖ CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 5: LUKA'S PRO SHOP (SILLY BALLS, TRAILS & CADDY PETS!)
+       ======================================================================== -->
+  <div id="shop-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title">🛍️ LUKA'S PRO SHOP</h2>
+      <p class="modal-subtitle" id="shop-coins-banner">Your Golf Coins: 🪙 30</p>
+
+      <div class="shop-section-title">⚽ Silly Golf Balls</div>
+      <div id="shop-balls-grid" class="shop-grid"></div>
+
+      <div class="shop-section-title">✨ Shot Tracer Colors</div>
+      <div id="shop-tracers-grid" class="shop-grid"></div>
+
+      <div class="shop-section-title">💫 Special Flight Effects</div>
+      <div id="shop-effects-grid" class="shop-grid"></div>
+
+      <div class="shop-section-title">🌈 Flight Trails</div>
+      <div id="shop-trails-grid" class="shop-grid"></div>
+
+      <div class="shop-section-title">🐶 Caddy Pet Companions</div>
+      <div id="shop-pets-grid" class="shop-grid"></div>
+
+      <div style="margin-top: 18px;">
+        <button id="btn-close-shop" class="big-cta-btn" type="button">
+          ✅ DONE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 5B: MINI-GOLF BALL COLOR & CLUB COLOR PICKER (BEFORE STARTING ROUND)
+       ======================================================================== -->
+  <div id="minigolf-gear-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card" style="width:880px;">
+      <h2 class="modal-title">🎡 CHOOSE YOUR MINI-GOLF GEAR!</h2>
+      <p class="modal-subtitle">Pick your favorite Golf Ball color and Golf Club color for this round!</p>
+
+      <div class="gear-preview-banner">
+        <div class="gear-preview-item">
+          <span class="color-dot" id="preview-ball-dot" style="background:#FFD600;"></span>
+          <span id="preview-ball-label">Ball: Sunny Yellow</span>
+        </div>
+        <div class="gear-preview-item">
+          <span class="color-dot" id="preview-club-dot" style="background:#FFD600; border-radius:8px;"></span>
+          <span id="preview-club-label">Club: Champion Gold</span>
+        </div>
+      </div>
+
+      <div class="shop-section-title">⚪ 1. Choose Golf Ball Color</div>
+      <div id="gear-ball-colors-grid" class="gear-swatch-grid"></div>
+
+      <div class="shop-section-title">🏌️ 2. Choose Golf Club Color</div>
+      <div id="gear-club-colors-grid" class="gear-swatch-grid"></div>
+
+      <div style="margin-top: 14px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button id="btn-start-minigolf-round" class="big-cta-btn" type="button">
+          🎡 TEE OFF MINI-GOLF!
+        </button>
+        <button id="btn-close-minigolf-gear" class="big-cta-btn secondary" type="button">
+          ✖ BACK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 6: HIDDEN PARENTAL GATE (3-SECOND LONG-PRESS TOP-LEFT)
+       ======================================================================== -->
+  <div id="parental-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 class="modal-title">🔒 PARENTAL SETTINGS GATE</h2>
+      <p class="modal-subtitle">Customize Luka's math level, adaptive auto-progression, or reset records.</p>
+
+      <div class="parental-row">
+        <label>Adaptive Auto-Progression (Easier/Harder)</label>
+        <button id="btn-toggle-adaptive" class="toggle-pill-btn" type="button" style="background:#7B1FA2;">
+          Auto-Adapt: ON
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Current Age / Difficulty Level</label>
+        <button id="btn-toggle-difficulty-level" class="toggle-pill-btn" type="button" style="background:#00897B;">
+          🌱 Level 1: Kindergarten
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Tee Drive Math Level</label>
+        <button id="btn-toggle-math-mode" class="toggle-pill-btn" type="button">
+          Starter: Match & Mini-Games
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Spoken Voice Prompts</label>
+        <button id="btn-toggle-voice" class="toggle-pill-btn" type="button">
+          Voice: ON
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Cartoon Sound Effects</label>
+        <button id="btn-toggle-sfx" class="toggle-pill-btn" type="button">
+          SFX: ON
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Talking Calculator Operations</label>
+        <button id="btn-toggle-calc-ops" class="toggle-pill-btn" type="button" style="background:#0288D1;">
+          Operations: + / − Only
+        </button>
+      </div>
+
+      <div class="parental-row">
+        <label>Jump to Specific Hole (1–18)</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;" id="parental-hole-jumper"></div>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <button id="btn-test-voice" class="big-cta-btn secondary" type="button">
+          🔊 TEST VOICE
+        </button>
+        <button id="btn-reset-scores" class="big-cta-btn danger" type="button">
+          🗑️ RESET SCORES
+        </button>
+        <button id="btn-close-parental" class="big-cta-btn" type="button">
+          ✅ DONE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 7: TALKING DINO-GOLF CALCULATOR
+       ======================================================================== -->
+  <div id="calculator-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="calculator-shell">
+      <!-- Calculator Top Bar: Back Button, Title & Theme Pills in 1 compact bar! -->
+      <div class="calc-top-bar">
+        <button id="btn-calc-back" class="calc-back-btn" type="button">
+          ⬅ BACK TO MENU
+        </button>
+        <div class="calc-title-box">
+          <h2 class="calc-title">🧮 TALKING CALCULATOR</h2>
+        </div>
+        <!-- Celebration Effect Picker Tabs -->
+        <div class="calc-effects-bar">
+          <span class="calc-effects-label">PARADE:</span>
+          <div class="calc-effects-pills">
+            <button class="calc-effect-pill active" data-effect="cars" type="button">🏎️ Cars</button>
+            <button class="calc-effect-pill" data-effect="balls" type="button">⛳ Balls</button>
+            <button class="calc-effect-pill" data-effect="dinos" type="button">🦖 Dinos</button>
+            <button class="calc-effect-pill" data-effect="pizzas" type="button">🍕 Pizzas</button>
+            <button class="calc-effect-pill" data-effect="random" type="button">🎲 Surprise</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Body Container: 2-Column Side-by-Side in Landscape, 1-Column in Portrait -->
+      <div class="calc-body-grid">
+        <!-- LEFT COLUMN: LCD Screen & Animated Celebration Stage -->
+        <div class="calc-left-col">
+          <!-- LCD Display Screen -->
+          <div class="calc-lcd-screen">
+            <div class="calc-lcd-top">
+              <span id="calc-lcd-history" class="calc-lcd-history">READY TO SOLVE</span>
+              <span id="calc-lcd-audio-status" class="calc-lcd-voice">🔊 VOICE ON</span>
+            </div>
+            <div class="calc-lcd-main">
+              <span id="calc-lcd-value" class="calc-lcd-value">0</span>
+            </div>
+            <div id="calc-equation-caption" class="calc-equation-caption">
+              Tap numbers to hear them speak! Press = to solve!
+            </div>
+          </div>
+
+          <!-- Celebration Animation Stage -->
+          <div id="calc-stage" class="calc-stage">
+            <div id="calc-stage-banner" class="calc-stage-banner hidden">
+              <span id="calc-banner-text">🎉 20 SPEEDY RACE CARS! 🎉</span>
+            </div>
+            <div id="calc-sprites-container" class="calc-sprites-container"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Giant Touch Arcade Keypad -->
+        <div class="calc-right-col">
+          <div class="calc-keypad-container">
+            <!-- Top Action & Operator Row -->
+            <div class="calc-ops-row">
+              <button class="calc-key key-clear" id="btn-calc-clear" type="button">C</button>
+              <button class="calc-key key-backspace" id="btn-calc-backspace" type="button">⌫</button>
+              <button class="calc-key key-op" data-op="+" type="button">➕</button>
+              <button class="calc-key key-op" data-op="-" type="button">➖</button>
+              <button class="calc-key key-op key-advanced-op hidden" data-op="*" type="button">✖️</button>
+              <button class="calc-key key-op key-advanced-op hidden" data-op="/" type="button">➗</button>
+            </div>
+
+            <!-- 3-Column Digit Grid + Equals Button -->
+            <div class="calc-digits-grid">
+              <button class="calc-key key-num" data-val="7" type="button">7</button>
+              <button class="calc-key key-num" data-val="8" type="button">8</button>
+              <button class="calc-key key-num" data-val="9" type="button">9</button>
+              <button class="calc-key key-num" data-val="4" type="button">4</button>
+              <button class="calc-key key-num" data-val="5" type="button">5</button>
+              <button class="calc-key key-num" data-val="6" type="button">6</button>
+              <button class="calc-key key-num" data-val="1" type="button">1</button>
+              <button class="calc-key key-num" data-val="2" type="button">2</button>
+              <button class="calc-key key-num" data-val="3" type="button">3</button>
+              <button class="calc-key key-num key-zero" data-val="0" type="button">0</button>
+              <button class="calc-key key-equals" id="btn-calc-equals" type="button">🟰 SOLVE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div> <!-- /#game-stage -->
+  </div> <!-- /#viewport-root -->
+
+  <!-- APPLICATION BOOTSTRAP MODULE -->
+  <script type="module">
+    // Global Error Boundary & Diagnostic Reporter
+    window.addEventListener('error', (e) => {
+      console.error('LUKA GOLF ERROR:', e.message, e.filename, e.lineno, e.colno, e.error);
+      let box = document.getElementById('luka-debug-err-box');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'luka-debug-err-box';
+        box.style.cssText = 'position:fixed;top:8px;left:8px;right:8px;z-index:999999;background:rgba(211,47,47,0.96);color:#FFF;font-family:sans-serif;font-size:14px;font-weight:bold;padding:10px 14px;border:3px solid #FFD600;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.8);word-break:break-all;pointer-events:auto;';
+        document.body.appendChild(box);
+      }
+      box.textContent = `⚠️ Error: ${e.message} (${e.filename ? e.filename.split('/').pop() : 'script'}:${e.lineno})`;
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('LUKA GOLF PROMISE ERROR:', e.reason);
+    });
+
+    import {
+      StorageManager,
+      PRO_SHOP_CATALOG,
+      DIFFICULTY_LEVELS,
+      MINIGOLF_BALL_COLORS,
+      MINIGOLF_CLUB_COLORS
+    } from './core/Storage.js';
+    import { AudioEngine } from './core/AudioEngine.js';
+    import { GameState } from './core/GameState.js';
+    import { COURSE_THEMES, HOLES } from './game/Courses.js';
+    import { MathEngine, MINIGOLF_HOLES } from './game/MathEngine.js';
+    import { AnimationController } from './game/Animations.js';
+    import { CanvasRenderer } from './game/Renderer.js';
+
+    const storage = new StorageManager();
+    const audio = new AudioEngine(storage);
+    const gameState = new GameState(storage);
+    const animations = new AnimationController(audio);
+    const canvas = document.getElementById('game-canvas');
+    const renderer = new CanvasRenderer(canvas, animations, storage);
+
+    // Register PWA Offline Service Worker for Seamless Standalone Phone & Tablet Play
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    const imgPrefix = (window.location.pathname || '').includes('/src/') ? '../assets/images/ui' : './assets/images/ui';
+
+    // DOM References
+    const elCourseName   = document.getElementById('hud-course-name');
+    const elHoleLabel    = document.getElementById('hud-hole-label');
+    const elTargetLabel  = document.getElementById('hud-target-label');
+    const elTargetValue  = document.getElementById('hud-target-value');
+    const elStrokesLabel = document.getElementById('hud-strokes-label');
+    const elStrokesValue = document.getElementById('hud-strokes-value');
+    const elCoinsValue   = document.getElementById('hud-coins-value');
+    const elMenuCoins    = document.getElementById('menu-coins-label');
+    const elMegaMeter    = document.getElementById('hud-mega-meter');
+    const elMegaPill     = document.getElementById('hud-mega-pill');
+    const btnBackToMenu  = document.getElementById('btn-back-to-menu');
+    const elPromptTitle  = document.getElementById('math-prompt-title');
+    const elWorkspace    = document.getElementById('math-workspace');
+    const elMathDeck     = document.getElementById('math-deck');
+    const elAimBar       = document.getElementById('aim-bar');
+    const elRangeModeBar = document.getElementById('range-mode-bar');
+    const btnTurboBoost  = document.getElementById('btn-turbo-boost');
+    const elMegaCenterPopup = document.getElementById('mega-center-popup');
+    const btnMegaCenterActivate = document.getElementById('btn-mega-center-activate');
+    const elMegaActiveIndicator = document.getElementById('mega-active-indicator');
+    let isMegaPowerActive = false;
+
+    // Modals & Overlays
+    const overlayMainMenu   = document.getElementById('main-menu-overlay');
+    const modalRescue       = document.getElementById('rescue-modal');
+    const modalCelebration  = document.getElementById('celebration-modal');
+    const modalCourses      = document.getElementById('courses-modal');
+    const modalTrophy       = document.getElementById('trophy-modal');
+    const modalLeaderboard  = document.getElementById('leaderboard-modal');
+    const modalMiniGolfGear = document.getElementById('minigolf-gear-modal');
+    const modalShop         = document.getElementById('shop-modal');
+    const modalParental     = document.getElementById('parental-modal');
+    const modalCalculator   = document.getElementById('calculator-modal');
+
+    let isAnimatingShot = false;
+    let pendingMiniGolfStartHole = 0;
+
+    // ========================================================================
+    // RESPONSIVE DUAL-ORIENTATION STAGE SCALER (MOBILE LANDSCAPE, PORTRAIT & ONN TABLET)
+    // ========================================================================
+    const elGameStage = document.getElementById('game-stage');
+
+    function fitViewportStage() {
+      const vv = window.visualViewport;
+      const vw = Math.max(240, vv ? vv.width : window.innerWidth);
+      const vh = Math.max(240, vv ? vv.height : window.innerHeight);
+      const isPortrait = vh > vw * 1.05;
+
+      let stageW;
+      let stageH;
+
+      if (isPortrait) {
+        // Portrait Mode (Phone held vertically):
+        // Full-bleed 100% canvas stage with floating Top HUD and auto-fading Bottom Math Deck
+        elGameStage.classList.add('is-portrait');
+        stageW = 720;
+        stageH = Math.max(1080, Math.min(1480, Math.round(720 * (vh / vw))));
+      } else {
+        // Landscape Mode (Phone held sideways, Onn 1280x800 Tablet, or Desktop):
+        elGameStage.classList.remove('is-portrait');
+        stageH = vh < 500 ? 730 : 800;
+        stageW = Math.max(1220, Math.min(1640, Math.round(stageH * (vw / vh))));
+      }
+
+      const scale = Math.min(vw / stageW, vh / stageH);
+      elGameStage.style.width = `${stageW}px`;
+      elGameStage.style.height = `${stageH}px`;
+      elGameStage.style.transform = `scale(${scale.toFixed(4)})`;
+    }
+
+    window.addEventListener('resize', fitViewportStage);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(fitViewportStage, 80);
+      setTimeout(fitViewportStage, 250);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', fitViewportStage);
+      window.visualViewport.addEventListener('scroll', fitViewportStage);
+    }
+    fitViewportStage();
+
+    // Fullscreen Toggle Button for Mobile & Tablet
+    const btnFullscreen = document.getElementById('menu-btn-fullscreen');
+    if (btnFullscreen) {
+      btnFullscreen.addEventListener('click', () => {
+        audio.playSfx('pop');
+        const docEl = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+          if (req) {
+            req.call(docEl).catch(() => {});
+          }
+        } else {
+          const exit = document.exitFullscreen || document.webkitExitFullscreen;
+          if (exit) {
+            exit.call(document).catch(() => {});
+          }
+        }
+        setTimeout(fitViewportStage, 150);
+      });
+    }
+
+    // ========================================================================
+    // DIFFICULTY / AGE PROGRESSION LEVEL (HIDDEN INSIDE PARENTAL CONTROL MENU)
+    // ========================================================================
+    function applyDifficultyLevel(newLevelId, announce = true) {
+      const meta = DIFFICULTY_LEVELS[newLevelId] || DIFFICULTY_LEVELS.kindergarten;
+      const newMathMode = newLevelId === 'kindergarten' ? 'starter' : 'advanced';
+      storage.updateSettings({ difficultyLevel: newLevelId, mathMode: newMathMode });
+      refreshParentalButtons();
+
+      // Regenerate active challenge for the new difficulty level
+      if (gameState.appMode === 'driving_range') {
+        gameState.loadNextDrivingRangeTarget();
+      } else if (gameState.appMode === 'minigolf') {
+        gameState.loadMiniGolfHole();
+      } else {
+        gameState._generateChallengeForCurrentStage(false);
+      }
+      syncUIWithGameState(false);
+
+      if (announce) {
+        audio.playSfx('merge');
+        audio.speak(`${meta.shortLabel} level selected!`, `diff_${newLevelId}`);
+      }
+    }
+
+    // ========================================================================
+    // INITIALIZE GAME & RENDER LOOP
+    // ========================================================================
+    function initGame() {
+      try {
+        gameState.startCourse('tropical', 0);
+        syncUIWithGameState(false);
+        elMenuCoins.textContent = `🪙 ${storage.data.coins}`;
+      } catch (err) {
+        console.error('initGame error:', err);
+      } finally {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    let lastRenderErrorLogged = null;
+    function gameLoop(now) {
+      try {
+        animations.update(now);
+        renderer.render(gameState, now);
+      } catch (err) {
+        if (!lastRenderErrorLogged || lastRenderErrorLogged !== err.message) {
+          lastRenderErrorLogged = err.message;
+          console.error('GameLoop Render Error:', err);
+        }
+      } finally {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // ========================================================================
+    // MAIN MENU NAVIGATION HANDLERS
+    // ========================================================================
+    function openMainMenu() {
+      audio.stopSpeech();
+      elMenuCoins.textContent = `🪙 ${storage.data.coins}`;
+      overlayMainMenu.classList.remove('hidden');
+    }
+
+    if (btnBackToMenu) {
+      btnBackToMenu.addEventListener('click', () => {
+        audio.playSfx('pop');
+        openMainMenu();
+      });
+    }
+
+    document.getElementById('menu-btn-courses').addEventListener('click', () => {
+      audio.playSfx('pop');
+      overlayMainMenu.classList.add('hidden');
+      openCoursesModal();
+    });
+
+    document.getElementById('menu-btn-range').addEventListener('click', () => {
+      audio.playSfx('pop');
+      overlayMainMenu.classList.add('hidden');
+      gameState.startDrivingRange('exact_3digit');
+      syncUIWithGameState(true);
+    });
+
+    document.getElementById('menu-btn-minigolf').addEventListener('click', () => {
+      audio.playSfx('pop');
+      overlayMainMenu.classList.add('hidden');
+      openMiniGolfGearModal(0);
+    });
+
+    document.getElementById('menu-btn-shop').addEventListener('click', () => {
+      audio.playSfx('pop');
+      openShopModal();
+    });
+
+    document.getElementById('menu-btn-trophies').addEventListener('click', () => {
+      audio.playSfx('pop');
+      openTrophyModal();
+    });
+
+    document.getElementById('menu-btn-leaderboard').addEventListener('click', () => {
+      audio.playSfx('pop');
+      openLeaderboardModal();
+    });
+
+    // ========================================================================
+    // INTERACTIVE CANVAS TOUCH HANDLER (DRIVING RANGE TARGETS & AIM LANES)
+    // ========================================================================
+    function triggerDrivingRangeChoice(optVal) {
+      if (isAnimatingShot) return;
+      const challenge = gameState.currentChallenge;
+      if (!challenge || challenge.tier !== 'driving_range') return;
+
+      audio.playSfx('pop');
+      if (challenge.subMode === 'basic_math') {
+        if (optVal === challenge.targetValue && challenge.successAudioText) {
+          audio.speak(challenge.successAudioText, challenge.successAudioKey);
+        } else {
+          audio.speak(`${MathEngine.numberToWords(optVal)}!`, `num_${optVal}`);
+        }
+      } else {
+        if (optVal === challenge.targetValue && challenge.successAudioText) {
+          audio.speak(challenge.successAudioText, challenge.successAudioKey || `num_${optVal}`);
+        } else {
+          audio.speak(`${MathEngine.numberToWords(optVal)} yards!`, `num_${optVal}`);
+        }
+      }
+      handleAnswerSubmission(optVal);
+    }
+
+    function selectAndConfirmAimLane(lane) {
+      if (isAnimatingShot) return;
+      const wasStep1 = gameState.needsAimSelection();
+      const { bonus } = gameState.confirmAimLane(lane);
+      audio.playSfx('merge');
+
+      const dirNames = { left: 'Left', center: 'Center', right: 'Right' };
+      const dirWord = dirNames[lane] || 'Center';
+      const aimSpeech = bonus
+        ? `Aiming ${dirWord} at the bonus target!`
+        : `Aiming ${dirWord}!`;
+
+      refreshTopDeckBars();
+
+      if (wasStep1) {
+        const chal = gameState.currentChallenge;
+        if (chal) {
+          elPromptTitle.textContent = chal.promptTitle;
+          renderMathWorkspace(chal);
+          // Speak number prompt immediately without preamble delays!
+          audio.speak(chal.spokenPrompt, chal.spokenPromptKey);
+        }
+      } else {
+        audio.speak(aimSpeech, `aim_lock_${lane}_${bonus ? 'bonus' : 'plain'}`);
+      }
+    }
+
+    canvas.addEventListener('pointerdown', e => {
+      if (isAnimatingShot) return;
+      const { x: cx, y: cy } = renderer.screenToWorld(e.clientX, e.clientY);
+
+      // 1. Driving Range: Tapping any of the 3 Canyon Target Signs submits that number!
+      if (gameState.appMode === 'driving_range' && Array.isArray(gameState.rangeTargets)) {
+        for (const t of gameState.rangeTargets) {
+          const hb = t.hitBox;
+          if (hb && cx >= hb.x1 && cx <= hb.x2 && cy >= hb.y1 && cy <= hb.y2) {
+            triggerDrivingRangeChoice(t.value);
+            return;
+          }
+          const dist = Math.hypot(cx - t.x, cy - t.y);
+          if (dist <= 95) {
+            triggerDrivingRangeChoice(t.value);
+            return;
+          }
+        }
+      }
+
+      // 2. 18-Hole Course: Tapping a Fairway Bonus Target or Aim Lane Pad selects that lane!
+      if (gameState.appMode === 'course') {
+        if (Array.isArray(gameState.bonusTargets)) {
+          for (const target of gameState.bonusTargets) {
+            if (target.collected) continue;
+            const hb = target.hitBox;
+            if (hb && cx >= hb.x1 && cx <= hb.x2 && cy >= hb.y1 && cy <= hb.y2) {
+              selectAndConfirmAimLane(target.lane);
+              return;
+            }
+          }
+        }
+        if (Array.isArray(gameState.aimLaneHitBoxes)) {
+          for (const lhb of gameState.aimLaneHitBoxes) {
+            if (cx >= lhb.x1 && cx <= lhb.x2 && cy >= lhb.y1 && cy <= lhb.y2) {
+              selectAndConfirmAimLane(lhb.lane);
+              return;
+            }
+          }
+        }
+      }
+    });
+
+    // ========================================================================
+    // AIM BAR & DRIVING RANGE SUB-MODE SWITCHER
+    // ========================================================================
+    function refreshTopDeckBars() {
+      if (gameState.appMode === 'driving_range') {
+        elAimBar.classList.add('hidden');
+        elRangeModeBar.classList.remove('hidden');
+        elRangeModeBar.querySelectorAll('button').forEach(b => {
+          b.classList.toggle('active', b.dataset.rmode === gameState.rangeSubMode);
+        });
+        return;
+      }
+
+      elRangeModeBar.classList.add('hidden');
+      // Hide the top small aim bar during Step 1 Aim Selection (since big cards are shown in the main deck!)
+      if (
+        gameState.appMode === 'minigolf' ||
+        gameState.lie === 'green' ||
+        gameState.lie === 'holed' ||
+        gameState.needsAimSelection()
+      ) {
+        elAimBar.classList.add('hidden');
+        return;
+      }
+
+      elAimBar.classList.remove('hidden');
+      const lanes = [
+        { id: 'left',   el: document.getElementById('aim-btn-left'),   base: '⬅️ AIM LEFT' },
+        { id: 'center', el: document.getElementById('aim-btn-center'), base: '⬆️ CENTER' },
+        { id: 'right',  el: document.getElementById('aim-btn-right'),  base: '➡️ AIM RIGHT' }
+      ];
+
+      lanes.forEach(item => {
+        const bonus = (gameState.bonusTargets || []).find(b => b.lane === item.id && !b.collected);
+        item.el.textContent = bonus ? `${item.base} (${bonus.icon})` : item.base;
+        item.el.classList.toggle('active', gameState.aimLane === item.id);
+      });
+    }
+
+    ['left', 'center', 'right'].forEach(lane => {
+      document.getElementById(`aim-btn-${lane}`).addEventListener('click', () => {
+        if (isAnimatingShot) return;
+        selectAndConfirmAimLane(lane);
+      });
+    });
+
+    elRangeModeBar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (isAnimatingShot) return;
+        audio.playSfx('pop');
+        gameState.setDrivingRangeSubMode(btn.dataset.rmode);
+        syncUIWithGameState(true);
+      });
+    });
+
+    btnTurboBoost.addEventListener('click', () => {
+      if (animations.triggerTurboBoost()) {
+        btnTurboBoost.classList.add('hidden');
+        storage.addCoins(5);
+        elCoinsValue.textContent = `🪙 ${storage.data.coins}`;
+      }
+    });
+
+    if (btnMegaCenterActivate) {
+      btnMegaCenterActivate.addEventListener('click', () => {
+        isMegaPowerActive = true;
+        animations.isMegaActive = true;
+        audio.playSfx('dbz_charge');
+        audio.speakInstant('Super Saiyan power locked and loaded!');
+        if (elMegaCenterPopup) elMegaCenterPopup.classList.add('hidden');
+        if (elMegaActiveIndicator) elMegaActiveIndicator.classList.remove('hidden');
+      });
+    }
+
+    // ========================================================================
+    // HUD & CONCRETE MATH DECK RENDERING
+    // ========================================================================
+    function syncUIWithGameState(speakPrompt = false) {
+      const hole = gameState.currentHole;
+      const challenge = gameState.currentChallenge;
+
+      // Bring back the Math Deck smoothly after any shot animation!
+      elMathDeck.classList.remove('faded-out');
+      elCoinsValue.textContent = `🪙 ${storage.data.coins}`;
+
+      // Update Live Mega Power Drive Streak Charger Pill
+      if (elMegaMeter) {
+        const streak = gameState.megaDriveStreak || 0;
+        const isUnlocked = gameState.megaDriveUnlocked || isMegaPowerActive;
+        if (isUnlocked) {
+          elMegaMeter.textContent = '⚡ MEGA READY! 🔥 🔥 🔥';
+          if (elMegaPill) elMegaPill.classList.add('unlocked');
+        } else if (streak === 2) {
+          elMegaMeter.textContent = '⚡ MEGA: 🔥 🔥 ⚪';
+          if (elMegaPill) elMegaPill.classList.remove('unlocked');
+        } else if (streak === 1) {
+          elMegaMeter.textContent = '⚡ MEGA: 🔥 ⚪ ⚪';
+          if (elMegaPill) elMegaPill.classList.remove('unlocked');
+        } else {
+          elMegaMeter.textContent = '⚡ MEGA: ⚪ ⚪ ⚪';
+          if (elMegaPill) elMegaPill.classList.remove('unlocked');
+        }
+      }
+
+      // Show/Hide Mega Power Drive Popup / Indicator on Tee Box when Unlocked
+      const isTeeDrive = gameState.appMode === 'course' && (gameState.lie === 'tee' || gameState.stageBeforeHazard === 'tee');
+      const canUseMega = gameState.megaDriveUnlocked || isMegaPowerActive;
+      if (isTeeDrive && canUseMega && !isAnimatingShot) {
+        if (!isMegaPowerActive && elMegaCenterPopup) {
+          elMegaCenterPopup.classList.remove('hidden');
+        }
+        if (isMegaPowerActive && elMegaActiveIndicator) {
+          elMegaActiveIndicator.classList.remove('hidden');
+        }
+        animations.isMegaActive = isMegaPowerActive;
+      } else {
+        if (elMegaCenterPopup) elMegaCenterPopup.classList.add('hidden');
+        if (elMegaActiveIndicator) elMegaActiveIndicator.classList.add('hidden');
+        animations.isMegaActive = isMegaPowerActive;
+      }
+
+      if (gameState.appMode === 'driving_range') {
+        elCourseName.textContent = '🌋 CANYON DRIVING RANGE';
+        elHoleLabel.textContent = '🎯 TARGET PRACTICE';
+        elTargetLabel.textContent = 'TARGET:';
+        elTargetValue.textContent = `${challenge.targetYards} YDS`;
+        elStrokesLabel.textContent = 'STREAK:';
+        elStrokesValue.textContent = `🔥 ${gameState.rangeStreak}`;
+      } else if (gameState.appMode === 'minigolf') {
+        elCourseName.textContent = '🎡 WACKY MINI-GOLF';
+        elHoleLabel.textContent = `🎡 H${hole.number}/9 • ${hole.name.toUpperCase()}`;
+        elTargetLabel.textContent = 'GOAL:';
+        elTargetValue.textContent = 'SOLVE';
+        elStrokesLabel.textContent = 'STROKES:';
+        elStrokesValue.textContent = `${gameState.strokes}`;
+      } else {
+        const themeMeta = (hole && hole.theme && COURSE_THEMES[hole.theme]) || COURSE_THEMES.tropical;
+        elCourseName.textContent = `${themeMeta.icon} ${themeMeta.name.toUpperCase()}`;
+        elHoleLabel.textContent = `⛳ HOLE ${hole ? hole.number : 1} • PAR ${hole ? hole.par : 3}`;
+        elStrokesLabel.textContent = 'STROKES:';
+        elStrokesValue.textContent = `${gameState.strokes}`;
+        if (challenge) {
+          elTargetLabel.textContent = challenge.tier === 'putt' ? 'PUTT:' : 'TARGET:';
+          elTargetValue.textContent = `${challenge.targetValue} ${(challenge.unit || '').toUpperCase()}`;
+        }
+      }
+
+      const isStep1Aim = gameState.needsAimSelection();
+      if (isStep1Aim) {
+        elPromptTitle.textContent = '🎯 STEP 1: WHERE DO YOU WANT TO AIM YOUR SHOT?';
+      } else if (challenge) {
+        elPromptTitle.textContent = challenge.promptTitle;
+      }
+
+      animations.resetForLie(gameState.lie, hole.pinOffsetX || 0);
+      refreshTopDeckBars();
+      renderMathWorkspace(challenge);
+
+      if (speakPrompt) {
+        if (isStep1Aim) {
+          audio.speak(
+            'First, choose where to aim! Tap Left, Center, or Right to aim at a bonus target!',
+            'aim_step_prompt'
+          );
+        } else if (challenge) {
+          audio.speak(challenge.spokenPrompt, challenge.spokenPromptKey);
+        }
+      }
+    }
+
+    // ========================================================================
+    // INTUITIVE CONCRETE SUBTRACTION TRAY (CROSS OUT GOLF BALLS TO TAKE AWAY!)
+    // ========================================================================
+    function createSubtractionTakeAwayBox(eq) {
+      const eqBox = document.createElement('div');
+      eqBox.className = 'ball-equation-box';
+      eqBox.style.flexDirection = 'column';
+      eqBox.style.gap = '6px';
+
+      let takenAwayCount = 0;
+      let countedRemaining = 0;
+
+      const banner = document.createElement('div');
+      banner.className = 'subtract-tray-banner';
+      banner.textContent = `Start with ${eq.a} ⛳ • Tap ${eq.b} to Take Away (-${eq.b})!`;
+      eqBox.appendChild(banner);
+
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.gap = '10px';
+      row.style.flexWrap = 'wrap';
+      row.style.justifyContent = 'center';
+
+      const cluster = document.createElement('div');
+      cluster.className = 'balls-cluster';
+
+      const ballButtons = [];
+      for (let i = 0; i < eq.a; i++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'countable-ball-btn';
+        if (i >= eq.a - eq.b) {
+          b.style.borderColor = '#FF5252';
+        }
+        b.textContent = '⛳';
+        b.addEventListener('click', () => {
+          if (!b.classList.contains('taken-away') && takenAwayCount < eq.b) {
+            takenAwayCount += 1;
+            b.classList.add('taken-away');
+            b.textContent = '❌';
+            const leftNow = eq.a - takenAwayCount;
+            audio.playSfx('subtract_step');
+            if (takenAwayCount < eq.b) {
+              banner.textContent = `Took away ${takenAwayCount}! Tap ${eq.b - takenAwayCount} more to take away!`;
+              audio.speak(`Took away ${takenAwayCount}!`, `sub_away_${takenAwayCount}`);
+            } else {
+              banner.textContent = `✅ Took away ${eq.b}! How many golf balls are left?`;
+              audio.speak(`Took away ${eq.b}! How many are left?`, `sub_ask_left_${eq.b}`);
+            }
+            return;
+          }
+
+          if (!b.classList.contains('taken-away')) {
+            if (!b.classList.contains('counted')) {
+              countedRemaining += 1;
+              b.classList.add('counted');
+              b.textContent = `${countedRemaining}`;
+            }
+            audio.playSfx('count_step');
+            audio.speak(`${b.textContent}`, `num_${b.textContent}`);
+          }
+        });
+        ballButtons.push(b);
+        cluster.appendChild(b);
+      }
+
+      const eqLabel = document.createElement('div');
+      eqLabel.className = 'addend-digit';
+      eqLabel.style.fontSize = '24px';
+      eqLabel.textContent = `${eq.a} - ${eq.b} = ?`;
+
+      row.appendChild(cluster);
+      row.appendChild(eqLabel);
+      eqBox.appendChild(row);
+      return eqBox;
+    }
+
+    function renderMathWorkspace(challenge) {
+      elWorkspace.innerHTML = '';
+      if (!challenge) return;
+
+      // ----------------------------------------------------------------------
+      // STEP 1 ON TEE & FAIRWAY SHOTS: CHOOSE LEFT / CENTER / RIGHT AIM FIRST!
+      // ----------------------------------------------------------------------
+      if (gameState.needsAimSelection()) {
+        const grid = document.createElement('div');
+        grid.className = 'aim-step-grid';
+
+        const laneDefs = [
+          { id: 'left',   title: '⬅️ AIM LEFT',   fallback: 'Left Fairway Lane' },
+          { id: 'center', title: '⬆️ AIM CENTER', fallback: '⛳ Straight at Flag' },
+          { id: 'right',  title: '➡️ AIM RIGHT',  fallback: 'Right Fairway Lane' }
+        ];
+
+        laneDefs.forEach(ld => {
+          const bonus = (gameState.bonusTargets || []).find(b => b.lane === ld.id && !b.collected);
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = `aim-choice-card ${bonus ? 'has-bonus' : ''}`;
+          card.innerHTML = `
+            <div class="aim-dir-title">${ld.title}</div>
+            ${
+              bonus
+                ? `<div class="aim-bonus-pill">${bonus.icon} HIT ${bonus.label}!</div>`
+                : `<div class="aim-fairway-pill">${ld.fallback}</div>`
+            }
+          `;
+          card.addEventListener('click', () => {
+            selectAndConfirmAimLane(ld.id);
+          });
+          grid.appendChild(card);
+        });
+
+        elWorkspace.appendChild(grid);
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // MODE: CANYON VOLCANO DRIVING RANGE (3-Digit Exact, Place Value, Basic Math)
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'driving_range') {
+        if (challenge.subMode === 'place_value_3digit') {
+          const track = document.createElement('div');
+          track.className = 'sequence-track';
+          const [h, t, o] = challenge.placeParts;
+          track.innerHTML = `
+            <div class="seq-node">${h}</div>
+            <span class="base10-plus">+</span>
+            <div class="seq-node">${t}</div>
+            <span class="base10-plus">+</span>
+            <div class="seq-node">${o}</div>
+            <span class="base10-plus">=</span>
+            <div class="seq-node missing">?</div>
+          `;
+          elWorkspace.appendChild(track);
+        } else if (challenge.subMode === 'basic_math') {
+          const eq = challenge.equation;
+          if (eq.op === '-') {
+            elWorkspace.appendChild(createSubtractionTakeAwayBox(eq));
+          } else {
+            const track = document.createElement('div');
+            track.className = 'sequence-track';
+            track.innerHTML = `
+              <div class="seq-node">${eq.a}</div>
+              <span class="base10-plus">${eq.op}</span>
+              <div class="seq-node">${eq.b}</div>
+              <span class="base10-plus">=</span>
+              <div class="seq-node missing">?</div>
+            `;
+            elWorkspace.appendChild(track);
+          }
+        }
+
+        challenge.options.forEach(optVal => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'number-card';
+          const unitLabel = challenge.subMode === 'basic_math' ? 'ANSWER' : 'YARDS TARGET';
+          btn.innerHTML = `
+            <span>${optVal}</span>
+            <span class="sub-unit">${unitLabel}</span>
+          `;
+          btn.addEventListener('click', () => {
+            triggerDrivingRangeChoice(optVal);
+          });
+          elWorkspace.appendChild(btn);
+        });
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // MODE: WACKY MINI-GOLF CARNIVAL (Equations + Touch-to-Count / Take-Away)
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'minigolf') {
+        const eq = challenge.equation;
+        const layout = document.createElement('div');
+        layout.className = 'putting-layout';
+
+        let eqBox;
+        if (challenge.subMode === 'subtract') {
+          eqBox = createSubtractionTakeAwayBox(eq);
+        } else {
+          eqBox = document.createElement('div');
+          eqBox.className = 'ball-equation-box';
+
+          let runningCount = 0;
+          function makeBallGroup(num, labelText) {
+            const col = document.createElement('div');
+            col.className = 'addend-column';
+            const cluster = document.createElement('div');
+            cluster.className = 'balls-cluster';
+            for (let i = 0; i < num; i++) {
+              const b = document.createElement('button');
+              b.type = 'button';
+              b.className = 'countable-ball-btn';
+              b.textContent = '⛳';
+              b.addEventListener('click', () => {
+                if (!b.classList.contains('counted')) {
+                  runningCount += 1;
+                  b.classList.add('counted');
+                  b.textContent = `${runningCount}`;
+                }
+                audio.playSfx('count_step');
+                audio.speak(`${b.textContent}`, `num_${b.textContent}`);
+              });
+              cluster.appendChild(b);
+            }
+            const d = document.createElement('div');
+            d.className = 'addend-digit';
+            d.textContent = labelText;
+            col.appendChild(cluster);
+            col.appendChild(d);
+            return col;
+          }
+
+          if (challenge.subMode === 'missing_addend') {
+            eqBox.appendChild(makeBallGroup(eq.a, `${eq.a}`));
+            const plusEl = document.createElement('span');
+            plusEl.className = 'base10-plus';
+            plusEl.textContent = '+';
+            eqBox.appendChild(plusEl);
+
+            const qNode = document.createElement('div');
+            qNode.className = 'seq-node missing';
+            qNode.textContent = '?';
+            eqBox.appendChild(qNode);
+
+            const eqEl = document.createElement('span');
+            eqEl.className = 'base10-plus';
+            eqEl.textContent = `= ${eq.total}`;
+            eqBox.appendChild(eqEl);
+          } else {
+            eqBox.appendChild(makeBallGroup(eq.a, `${eq.a}`));
+            const opEl = document.createElement('span');
+            opEl.className = 'base10-plus';
+            opEl.textContent = eq.op;
+            eqBox.appendChild(opEl);
+            eqBox.appendChild(makeBallGroup(eq.b, `${eq.b}`));
+            const eqEl = document.createElement('span');
+            eqEl.className = 'base10-plus';
+            eqEl.textContent = '=';
+            eqBox.appendChild(eqEl);
+          }
+        }
+
+        const optionsRow = document.createElement('div');
+        optionsRow.className = 'putt-options-row';
+        challenge.options.forEach(optVal => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'number-card';
+          card.style.minWidth = '150px';
+          card.innerHTML = `<span>${optVal}</span><span class="sub-unit">PUTT POWER</span>`;
+          card.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            if (optVal === challenge.targetValue && challenge.successAudioText) {
+              audio.speak(challenge.successAudioText, challenge.successAudioKey);
+            } else {
+              audio.speak(`${optVal}`, `num_${optVal}`);
+            }
+            handleAnswerSubmission(optVal);
+          });
+          optionsRow.appendChild(card);
+        });
+
+        layout.appendChild(eqBox);
+        layout.appendChild(optionsRow);
+        elWorkspace.appendChild(layout);
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 1A: TEE SHOT — DRIVER MATCHING, MONSTER POWER OR 2ND GRADE PLACE VALUE
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'tee' && challenge.subMode === 'place_value_3digit') {
+        const track = document.createElement('div');
+        track.className = 'sequence-track';
+        const [h, t, o] = challenge.placeParts;
+        track.innerHTML = `
+          <div class="seq-node">${h}</div>
+          <span class="base10-plus">+</span>
+          <div class="seq-node">${t}</div>
+          <span class="base10-plus">+</span>
+          <div class="seq-node">${o}</div>
+          <span class="base10-plus">=</span>
+          <div class="seq-node missing">?</div>
+        `;
+        elWorkspace.appendChild(track);
+
+        challenge.options.forEach(optVal => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'number-card';
+          btn.innerHTML = `<span>${optVal}</span><span class="sub-unit">PRO DRIVER</span>`;
+          btn.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            audio.speak(`${MathEngine.numberToWords(optVal)} yards!`, `num_${optVal}`);
+            handleAnswerSubmission(optVal);
+          });
+          elWorkspace.appendChild(btn);
+        });
+        return;
+      }
+
+      if (challenge.tier === 'tee' && (challenge.subMode === 'match' || challenge.subMode === 'biggest')) {
+        const isBiggestMode = challenge.subMode === 'biggest';
+        challenge.options.forEach(optVal => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'number-card';
+          const barPct = Math.min(100, Math.round((optVal / 450) * 100));
+          btn.innerHTML = `
+            <span>${optVal}</span>
+            <span class="sub-unit">${isBiggestMode ? 'POWER YARDS' : 'YARDS DRIVER'}</span>
+            ${isBiggestMode ? `<div class="power-bar-track"><div class="power-bar-fill" style="width:${barPct}%"></div></div>` : ''}
+          `;
+          btn.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            audio.speak(`${MathEngine.numberToWords(optVal)} yards!`, `num_${optVal}`);
+            handleAnswerSubmission(optVal);
+          });
+          elWorkspace.appendChild(btn);
+        });
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 1B: TEE SHOT — HUNDREDS NUMBER TRAIN (100 -> 200 -> [ ? ])
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'tee' && challenge.subMode === 'hundreds_train') {
+        const track = document.createElement('div');
+        track.className = 'sequence-track';
+        challenge.trainSequence.forEach((val, idx) => {
+          if (idx > 0) {
+            const arrow = document.createElement('span');
+            arrow.textContent = '➡️';
+            arrow.style.fontSize = '24px';
+            track.appendChild(arrow);
+          }
+          const car = document.createElement('div');
+          car.className = `seq-node ${val === '?' ? 'missing' : ''}`;
+          car.textContent = val === '?' ? '🚂 ?' : `🚃 ${val}`;
+          track.appendChild(car);
+        });
+        elWorkspace.appendChild(track);
+
+        challenge.options.forEach(optVal => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'number-card';
+          btn.style.minWidth = '155px';
+          btn.innerHTML = `<span>${optVal}</span><span class="sub-unit">YARDS CAR</span>`;
+          btn.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            audio.speak(`${MathEngine.numberToWords(optVal)} yards!`, `num_${optVal}`);
+            handleAnswerSubmission(optVal);
+          });
+          elWorkspace.appendChild(btn);
+        });
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 1C: TEE SHOT — ADVANCED BASE-10 PLACE VALUE ASSEMBLY
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'tee' && challenge.mode === 'advanced') {
+        let selectedHundreds = null;
+        let selectedTens = null;
+
+        const container = document.createElement('div');
+        container.className = 'base10-container';
+
+        const hundredsGroup = document.createElement('div');
+        hundredsGroup.className = 'base10-group';
+        const hundredsBtns = [];
+
+        challenge.hundredsOptions.forEach(hVal => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'number-card base10-card';
+          b.innerHTML = `<span>${hVal}</span><span class="sub-unit">HUNDREDS</span>`;
+          b.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            selectedHundreds = hVal;
+            hundredsBtns.forEach(x => x.classList.remove('selected'));
+            b.classList.add('selected');
+            audio.playSfx('pop');
+            updateMergedPreview();
+          });
+          hundredsBtns.push(b);
+          hundredsGroup.appendChild(b);
+        });
+
+        const plusSign = document.createElement('span');
+        plusSign.className = 'base10-plus';
+        plusSign.textContent = '+';
+
+        const tensGroup = document.createElement('div');
+        tensGroup.className = 'base10-group';
+        const tensBtns = [];
+
+        challenge.tensOptions.forEach(tVal => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'number-card base10-card';
+          b.innerHTML = `<span>${tVal}</span><span class="sub-unit">TENS</span>`;
+          b.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            selectedTens = tVal;
+            tensBtns.forEach(x => x.classList.remove('selected'));
+            b.classList.add('selected');
+            audio.playSfx('pop');
+            updateMergedPreview();
+          });
+          tensBtns.push(b);
+          tensGroup.appendChild(b);
+        });
+
+        const launchBtn = document.createElement('button');
+        launchBtn.type = 'button';
+        launchBtn.className = 'merge-launch-btn';
+        launchBtn.disabled = true;
+        launchBtn.textContent = 'TAP 100s + 10s';
+
+        function updateMergedPreview() {
+          if (selectedHundreds !== null && selectedTens !== null) {
+            const combined = selectedHundreds + selectedTens;
+            launchBtn.disabled = false;
+            launchBtn.innerHTML = `🏌️ SWING ${combined} YDS!`;
+            audio.playSfx('merge');
+            audio.speak(`${MathEngine.numberToWords(combined)} yards!`, `num_${combined}`);
+          }
+        }
+
+        launchBtn.addEventListener('click', () => {
+          if (isAnimatingShot || selectedHundreds === null || selectedTens === null) return;
+          handleAnswerSubmission(selectedHundreds + selectedTens);
+        });
+
+        container.appendChild(hundredsGroup);
+        container.appendChild(plusSign);
+        container.appendChild(tensGroup);
+        container.appendChild(launchBtn);
+        elWorkspace.appendChild(container);
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 2A: APPROACH SHOT — SKIP-COUNTING 10s BRIDGE PUZZLE
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'approach' && challenge.subMode === 'missing_ten') {
+        const track = document.createElement('div');
+        track.className = 'sequence-track';
+        challenge.stones.forEach((val, idx) => {
+          if (idx > 0) {
+            const arrow = document.createElement('span');
+            arrow.textContent = '➡️';
+            arrow.style.fontSize = '20px';
+            track.appendChild(arrow);
+          }
+          const node = document.createElement('div');
+          node.className = `seq-node ${val === '?' ? 'missing' : ''}`;
+          node.textContent = val === '?' ? '?' : `${val}`;
+          track.appendChild(node);
+        });
+        elWorkspace.appendChild(track);
+
+        challenge.options.forEach(optVal => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'number-card';
+          btn.style.minWidth = '150px';
+          btn.innerHTML = `<span>${optVal}</span><span class="sub-unit">YARDS STONE</span>`;
+          btn.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            audio.speak(`${optVal} yards!`, `num_${optVal}`);
+            handleAnswerSubmission(optVal);
+          });
+          elWorkspace.appendChild(btn);
+        });
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 2B: APPROACH SHOT — TEN-YARD STEPPING STONES (+10 BLOCKS)
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'approach') {
+        let currentPower = 0;
+
+        const row = document.createElement('div');
+        row.className = 'stepping-stones-row';
+
+        const stoneButtons = [];
+        for (let i = 1; i <= challenge.maxSteps; i++) {
+          const stoneYards = i * 10;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'stone-block-btn';
+          btn.innerHTML = `
+            <span>+10</span>
+            <span class="stone-total">${stoneYards} YDS</span>
+          `;
+          btn.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            if (currentPower < challenge.maxSteps * 10 && stoneYards > currentPower) {
+              currentPower += 10;
+            } else {
+              currentPower = stoneYards;
+            }
+            refreshStones();
+            audio.playSfx('count_step');
+            audio.speak(`${currentPower} yards!`, `num_${currentPower}`);
+          });
+          stoneButtons.push(btn);
+          row.appendChild(btn);
+        }
+
+        const readout = document.createElement('div');
+        readout.className = 'power-readout-box';
+        readout.innerHTML = `
+          <div style="font-size:13px; color:#FFF59D; font-weight:800;">SWING POWER</div>
+          <div class="power-num" id="approach-power-val">0 YDS</div>
+        `;
+
+        const clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'hud-btn';
+        clearBtn.style.minHeight = '88px';
+        clearBtn.innerHTML = `<span class="icon">🔄</span><span>ZERO</span>`;
+        clearBtn.addEventListener('click', () => {
+          currentPower = 0;
+          refreshStones();
+          audio.playSfx('pop');
+        });
+
+        const swingBtn = document.createElement('button');
+        swingBtn.type = 'button';
+        swingBtn.className = 'merge-launch-btn';
+        swingBtn.disabled = true;
+        swingBtn.textContent = '🏌️ SWING!';
+        swingBtn.addEventListener('click', () => {
+          if (isAnimatingShot || currentPower === 0) return;
+          handleAnswerSubmission(currentPower);
+        });
+
+        function refreshStones() {
+          stoneButtons.forEach((b, idx) => {
+            const val = (idx + 1) * 10;
+            b.classList.toggle('active', val <= currentPower);
+          });
+          const valEl = readout.querySelector('#approach-power-val');
+          if (valEl) valEl.textContent = `${currentPower} YDS`;
+          swingBtn.disabled = currentPower === 0;
+          swingBtn.textContent = currentPower > 0 ? `🏌️ SWING ${currentPower} YDS!` : '🏌️ SWING!';
+        }
+
+        row.appendChild(readout);
+        row.appendChild(clearBtn);
+        row.appendChild(swingBtn);
+        elWorkspace.appendChild(row);
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 3A: PUTTING GREEN — FILL THE GOLF BOX (MISSING ADDEND TEN-FRAME)
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'putt' && challenge.subMode === 'fill_box') {
+        let countedEmpty = 0;
+        const layout = document.createElement('div');
+        layout.className = 'putting-layout';
+
+        const box = document.createElement('div');
+        box.className = 'ball-equation-box';
+        const cluster = document.createElement('div');
+        cluster.className = 'balls-cluster';
+
+        for (let i = 0; i < challenge.totalSlots; i++) {
+          const slotBtn = document.createElement('button');
+          slotBtn.type = 'button';
+          slotBtn.className = 'countable-ball-btn';
+          if (i < challenge.filledSlots) {
+            slotBtn.textContent = '⛳';
+            slotBtn.style.opacity = '0.85';
+          } else {
+            slotBtn.textContent = '❓';
+            slotBtn.style.background = '#263238';
+            slotBtn.style.color = '#FFD600';
+            slotBtn.style.borderColor = '#FFD600';
+            slotBtn.addEventListener('click', () => {
+              if (!slotBtn.classList.contains('counted')) {
+                countedEmpty += 1;
+                slotBtn.classList.add('counted');
+                slotBtn.textContent = `+${countedEmpty}`;
+              }
+              audio.playSfx('count_step');
+              audio.speak(`${countedEmpty}`, `num_${countedEmpty}`);
+            });
+          }
+          cluster.appendChild(slotBtn);
+        }
+        box.appendChild(cluster);
+
+        const optionsRow = document.createElement('div');
+        optionsRow.className = 'putt-options-row';
+        challenge.options.forEach(optVal => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'number-card';
+          card.style.minWidth = '150px';
+          card.innerHTML = `<span>+${optVal}</span><span class="sub-unit">MORE BALLS</span>`;
+          card.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            if (optVal === challenge.targetValue) {
+              audio.speak(challenge.successAudioText, challenge.successAudioKey);
+            } else {
+              audio.speak(`${optVal}`, `num_${optVal}`);
+            }
+            handleAnswerSubmission(optVal);
+          });
+          optionsRow.appendChild(card);
+        });
+
+        layout.appendChild(box);
+        layout.appendChild(optionsRow);
+        elWorkspace.appendChild(layout);
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // TIER 3B: PUTTING GREEN — CONCRETE SINGLE-DIGIT ADDITION OR SUBTRACTION
+      // ----------------------------------------------------------------------
+      if (challenge.tier === 'putt') {
+        const layout = document.createElement('div');
+        layout.className = 'putting-layout';
+
+        let eqBox;
+        if (challenge.subMode === 'subtract_balls' && challenge.equation) {
+          eqBox = createSubtractionTakeAwayBox(challenge.equation);
+        } else {
+          let tapCount = 0;
+          const [leftAddend, rightAddend] = challenge.addends;
+
+          eqBox = document.createElement('div');
+          eqBox.className = 'ball-equation-box';
+
+          function createAddendColumn(count) {
+            const col = document.createElement('div');
+            col.className = 'addend-column';
+            const cluster = document.createElement('div');
+            cluster.className = 'balls-cluster';
+
+            for (let i = 0; i < count; i++) {
+              const ballBtn = document.createElement('button');
+              ballBtn.type = 'button';
+              ballBtn.className = 'countable-ball-btn';
+              ballBtn.textContent = '⛳';
+              ballBtn.addEventListener('click', () => {
+                if (!ballBtn.classList.contains('counted')) {
+                  tapCount += 1;
+                  ballBtn.classList.add('counted');
+                  ballBtn.textContent = `${tapCount}`;
+                }
+                audio.playSfx('count_step');
+                audio.speak(`${ballBtn.textContent}`, `num_${ballBtn.textContent}`);
+              });
+              cluster.appendChild(ballBtn);
+            }
+
+            const digit = document.createElement('div');
+            digit.className = 'addend-digit';
+            digit.textContent = `${count}`;
+
+            col.appendChild(cluster);
+            col.appendChild(digit);
+            return col;
+          }
+
+          const plusEl = document.createElement('span');
+          plusEl.className = 'base10-plus';
+          plusEl.textContent = '+';
+
+          const eqEl = document.createElement('span');
+          eqEl.className = 'base10-plus';
+          eqEl.textContent = '=';
+
+          eqBox.appendChild(createAddendColumn(leftAddend));
+          eqBox.appendChild(plusEl);
+          eqBox.appendChild(createAddendColumn(rightAddend));
+          eqBox.appendChild(eqEl);
+        }
+
+        const optionsRow = document.createElement('div');
+        optionsRow.className = 'putt-options-row';
+
+        challenge.options.forEach(optVal => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'number-card';
+          card.style.minWidth = '150px';
+          card.innerHTML = `
+            <span>${optVal}</span>
+            <span class="sub-unit">FEET PUTT</span>
+          `;
+          card.addEventListener('click', () => {
+            if (isAnimatingShot) return;
+            audio.playSfx('pop');
+            if (optVal === challenge.targetValue) {
+              audio.speak(challenge.successAudioText, challenge.successAudioKey);
+            } else {
+              audio.speak(`${optVal} feet!`, `num_${optVal}`);
+            }
+            handleAnswerSubmission(optVal);
+          });
+          optionsRow.appendChild(card);
+        });
+
+        layout.appendChild(eqBox);
+        layout.appendChild(optionsRow);
+        elWorkspace.appendChild(layout);
+      }
+    }
+
+    // ========================================================================
+    // SHOT SUBMISSION — AUTO-FADES MATH DECK & WAITS FOR BOTH ANIMATION + SPEECH!
+    // ========================================================================
+    function handleAnswerSubmission(submittedValue) {
+      if (isAnimatingShot) return;
+      isAnimatingShot = true;
+
+      // Immediately fade out the bottom Math Deck so 100% of the view is clear!
+      elMathDeck.classList.add('faded-out');
+
+      const hole = gameState.currentHole;
+      const result = gameState.submitAnswer(submittedValue);
+      elCoinsValue.textContent = `🪙 ${storage.data.coins}`;
+
+      // Announce Mega Power Drive Streak Unlock if earned!
+      if (result.megaJustUnlocked) {
+        audio.playSfx('dbz_charge');
+        audio.speak('Mega power drive unlocked! Super Saiyan drive ready, Luka!', 'mega_unlocked_announcement');
+        isMegaPowerActive = true;
+        animations.isMegaActive = true;
+        if (elMegaCenterPopup) {
+          elMegaCenterPopup.classList.remove('hidden');
+        }
+      }
+
+      // ----------------------------------------------------------------------
+      // 1. DRIVING RANGE SUBMISSION FLOW
+      // ----------------------------------------------------------------------
+      if (result.mode === 'driving_range') {
+        elStrokesValue.textContent = `🔥 ${result.streak}`;
+        if (result.correct) {
+          btnTurboBoost.classList.remove('hidden');
+        }
+
+        animations.playDrivingRangeShot(
+          result.correct,
+          result.targetX,
+          result.targetY,
+          result.isMilestone,
+          result.streak,
+          () => {
+            btnTurboBoost.classList.add('hidden');
+            // Let volcano lava eruption & sky fireworks play for 3.1s on milestones!
+            const waitAfterShot = result.isMilestone ? 3100 : 550;
+            setTimeout(async () => {
+              await audio.waitForCurrentSpeech(200);
+              isAnimatingShot = false;
+              if (result.correct) {
+                gameState.loadNextDrivingRangeTarget();
+                syncUIWithGameState(false);
+                const nextChal = gameState.currentChallenge;
+                audio.speakSequence([
+                  result.isMilestone
+                    ? { text: `Awesome! ${result.streak} in a row! Volcano fireworks!`, key: `streak_${result.streak}`, pauseMs: 240 }
+                    : { text: 'Bullseye! Great shot, Luka!', key: 'great_shot', pauseMs: 220 },
+                  nextChal ? { text: nextChal.spokenPrompt, key: nextChal.spokenPromptKey } : null
+                ], true);
+              } else {
+                syncUIWithGameState(false);
+                audio.speak('Bonk! Bounced off the target sign! Try that one again, Luka!', 'dr_try_again');
+              }
+            }, waitAfterShot);
+          }
+        );
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // 2. WACKY MINI-GOLF OBSTACLE & TUNNEL SUBMISSION FLOW
+      // ----------------------------------------------------------------------
+      if (result.mode === 'minigolf') {
+        elStrokesValue.textContent = `${result.strokes}`;
+
+        animations.playMiniGolfObstacleShot(
+          result.obstacleType,
+          result.correct,
+          result.isMilestone,
+          result.streak,
+          () => {
+            const waitMs = result.correct ? 700 : 550;
+            setTimeout(async () => {
+              await audio.waitForCurrentSpeech(220);
+              isAnimatingShot = false;
+              if (!result.correct) {
+                syncUIWithGameState(false);
+                audio.speak('Boing! Bounced off the obstacle! Try the equation again!', 'mg_try_again');
+                return;
+              }
+
+              const celMeta = animations.startCelebration(result.strokes, result.par, 0);
+              showHoleCelebrationModal(result, celMeta);
+            }, waitMs);
+          }
+        );
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // 3. 18-HOLE GOLF COURSE SUBMISSION FLOW
+      // ----------------------------------------------------------------------
+      elStrokesValue.textContent = `${result.strokes}`;
+
+      if (!result.correct) {
+        btnTurboBoost.classList.add('hidden');
+        if (elMegaCenterPopup) elMegaCenterPopup.classList.add('hidden');
+        if (elMegaActiveIndicator) elMegaActiveIndicator.classList.add('hidden');
+        isMegaPowerActive = false;
+        animations.isMegaActive = false;
+        animations.playMishapShot(result.mishapType, hole.pinOffsetX, async () => {
+          isAnimatingShot = false;
+          document.getElementById('rescue-headline').textContent = '💥 WHOOPS! TIME TO RESCUE!';
+          document.getElementById('rescue-text').textContent = 'Tap the button below to rescue your ball and try again!';
+          modalRescue.classList.remove('hidden');
+        });
+        return;
+      }
+
+      const megaActive = (isMegaPowerActive || result.isMegaPower) && result.shotType === 'drive';
+      isMegaPowerActive = false;
+      animations.isMegaActive = false;
+      if (elMegaCenterPopup) elMegaCenterPopup.classList.add('hidden');
+      if (elMegaActiveIndicator) elMegaActiveIndicator.classList.add('hidden');
+
+      if (result.shotType !== 'putt') {
+        btnTurboBoost.classList.remove('hidden');
+      }
+
+      const chal = gameState.currentChallenge;
+      animations.playCorrectShot(
+        result.shotType,
+        hole.pinOffsetX,
+        result.aimLane || 'center',
+        result.hitBonus || null,
+        () => {
+          btnTurboBoost.classList.add('hidden');
+          if (megaActive) {
+            storage.unlockTrophy('mega_crusher');
+          }
+          const postDrivePause = result.shotType === 'drive' ? (megaActive ? 1200 : 650) : 420;
+          setTimeout(async () => {
+            await audio.waitForCurrentSpeech(220);
+            isAnimatingShot = false;
+
+            if (!result.holed) {
+              syncUIWithGameState(false);
+              const nextChal = gameState.currentChallenge;
+              if (gameState.needsAimSelection()) {
+                audio.speakSequence([
+                  { text: 'Great shot, Luka!', key: 'great_shot', pauseMs: 220 },
+                  {
+                    text: 'First, choose where to aim! Tap Left, Center, or Right to aim at a bonus target!',
+                    key: 'aim_step_prompt'
+                  }
+                ], true);
+              } else {
+                audio.speakSequence([
+                  { text: 'Great shot, Luka!', key: 'great_shot', pauseMs: 220 },
+                  nextChal ? { text: nextChal.spokenPrompt, key: nextChal.spokenPromptKey } : null
+                ], true);
+              }
+              return;
+            }
+
+            const celMeta = animations.startCelebration(result.strokes, result.par, hole.pinOffsetX);
+            showHoleCelebrationModal(result, celMeta);
+          }, postDrivePause);
+        },
+        result.driveYards || hole.driveTargetYards || 300,
+        megaActive
+      );
+    }
+
+    function showHoleCelebrationModal(result, celMeta) {
+      const hole = gameState.currentHole;
+      document.getElementById('cel-headline').textContent = celMeta.headline;
+      document.getElementById('cel-subtext').textContent =
+        `Hole ${hole.number} (${hole.name}) completed in ${result.strokes} ${result.strokes === 1 ? 'stroke' : 'strokes'}!`;
+
+      // Update Educational Golf Scoring Math Card
+      const badgeEl = document.getElementById('cel-score-badge');
+      if (badgeEl) {
+        badgeEl.className = `cel-score-badge ${celMeta.type || 'par'}`;
+        badgeEl.textContent = `${(celMeta.scoreName || 'PAR').toUpperCase()} (${celMeta.diffSign || '0'})`;
+      }
+      const strokesNumEl = document.getElementById('cel-math-strokes');
+      if (strokesNumEl) strokesNumEl.textContent = `${result.strokes}`;
+      const parNumEl = document.getElementById('cel-math-par');
+      if (parNumEl) parNumEl.textContent = `${hole.par}`;
+      const diffNumEl = document.getElementById('cel-math-diff');
+      if (diffNumEl) diffNumEl.textContent = `${celMeta.diffSign || '0'}`;
+      const resNameEl = document.getElementById('cel-math-name');
+      if (resNameEl) resNameEl.textContent = `${(celMeta.scoreName || 'PAR').toUpperCase()}`;
+      const expEl = document.getElementById('cel-score-explanation');
+      if (expEl) expEl.textContent = celMeta.subtext;
+
+      const extraEl = document.getElementById('cel-extra-info');
+      let extraHtml = `<p style="margin:6px 0; color:#FFD600;">🪙 +${result.earnedCoins} Golf Coins Earned!</p>`;
+
+      if (result.unlockedTrophies && result.unlockedTrophies.length > 0) {
+        const badges = result.unlockedTrophies.map(t => `${t.icon} <strong>${t.title}</strong>`).join(' • ');
+        extraHtml += `<div style="margin-top:10px; color:#00E676;">🎉 NEW TROPHY UNLOCKED: ${badges}</div>`;
+      }
+
+      const nextBtn = document.getElementById('btn-next-hole');
+      if (gameState.appMode === 'minigolf') {
+        if (gameState.hasNextHole()) {
+          nextBtn.textContent = '🎡 NEXT MINI-GOLF HOLE!';
+        } else {
+          // Completed all 9 Wacky Mini-Golf Holes — Record on Leaderboard!
+          const mgTotals = gameState.getMiniGolfTotals();
+          const mgRecord = storage.recordMiniGolfRound(mgTotals.totalStrokes, mgTotals.totalPar);
+          const starImgMap = {
+            gold: `${imgPrefix}/star_gold.svg`,
+            silver: `${imgPrefix}/star_silver.svg`,
+            bronze: `${imgPrefix}/star_bronze.svg`
+          };
+          const starLabel = mgRecord.earnedStar.toUpperCase();
+          extraHtml += `
+            <div style="margin-top:14px; padding:12px; border-radius:20px; background:rgba(170,0,255,0.22); border:3px solid #FFD600;">
+              <img src="${starImgMap[mgRecord.earnedStar]}" alt="${starLabel} Star" style="width:60px;height:60px;vertical-align:middle;" />
+              <div style="font-size:25px; font-weight:900; color:#FFD600;">
+                🎡 9-HOLE MINI-GOLF COURSE COMPLETE!
+              </div>
+              <div>Total Score: <strong>${mgTotals.totalStrokes} Strokes</strong> (Par ${mgTotals.totalPar}) • Earned <strong>${starLabel} STAR</strong>!</div>
+            </div>
+          `;
+          nextBtn.textContent = '🏅 VIEW MINI-GOLF LEADERBOARD!';
+        }
+      } else if (gameState.hasNextHole()) {
+        nextBtn.textContent = '➡️ NEXT HOLE!';
+      } else {
+        const totals = gameState.getCourseTotals();
+        const recordResult = storage.recordCourseCompletion(
+          totals.courseKey,
+          totals.totalStrokes,
+          totals.totalPar
+        );
+        const starImgMap = {
+          gold: `${imgPrefix}/star_gold.svg`,
+          silver: `${imgPrefix}/star_silver.svg`,
+          bronze: `${imgPrefix}/star_bronze.svg`
+        };
+        const starLabel = recordResult.earnedStar.toUpperCase();
+        extraHtml += `
+          <div style="margin-top:14px; padding:12px; border-radius:20px; background:rgba(255,255,255,0.1); border:3px solid #FFD600;">
+            <img src="${starImgMap[recordResult.earnedStar]}" alt="${starLabel} Star" style="width:64px;height:64px;vertical-align:middle;" />
+            <div style="font-size:26px; font-weight:900; color:#FFD600;">
+              ${totals.courseMeta.name.toUpperCase()} COMPLETE!
+            </div>
+            <div>Total Score: ${totals.totalStrokes} Strokes (Par ${totals.totalPar}) • Earned <strong>${starLabel} STAR</strong>!</div>
+          </div>
+        `;
+        nextBtn.textContent = '🗺️ CHOOSE NEXT COURSE!';
+      }
+
+      extraEl.innerHTML = extraHtml;
+      modalCelebration.classList.remove('hidden');
+      audio.speak(celMeta.scoreSpeech || celMeta.subtext, celMeta.scoreKey || `cel_${celMeta.type}`);
+    }
+
+    // ========================================================================
+    // MODAL BUTTON HANDLERS
+    // ========================================================================
+    document.getElementById('btn-rescue-retry').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalRescue.classList.add('hidden');
+      gameState.prepareRescueShot();
+      syncUIWithGameState(true);
+    });
+
+    document.getElementById('btn-next-hole').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalCelebration.classList.add('hidden');
+      if (gameState.appMode === 'minigolf') {
+        if (gameState.hasNextHole()) {
+          gameState.advanceToNextHole();
+          syncUIWithGameState(true);
+        } else {
+          openLeaderboardModal();
+        }
+      } else if (gameState.hasNextHole()) {
+        gameState.advanceToNextHole();
+        syncUIWithGameState(true);
+      } else {
+        openCoursesModal();
+      }
+    });
+
+    document.getElementById('btn-hear-prompt').addEventListener('click', () => {
+      audio.playSfx('pop');
+      if (gameState.needsAimSelection()) {
+        audio.speak(
+          'First, choose where to aim! Tap Left, Center, or Right to aim at a bonus target!',
+          'aim_step_prompt'
+        );
+      } else if (gameState.currentChallenge) {
+        audio.speak(gameState.currentChallenge.spokenPrompt, gameState.currentChallenge.spokenPromptKey);
+      }
+    });
+
+    // ========================================================================
+    // MINI-GOLF BALL COLOR & CLUB COLOR PICKER MODAL (BEFORE STARTING ROUND)
+    // ========================================================================
+    function openMiniGolfGearModal(startHoleIndex = 0) {
+      pendingMiniGolfStartHole = startHoleIndex;
+      renderMiniGolfGearPicker();
+      modalMiniGolfGear.classList.remove('hidden');
+      audio.speak(
+        'Pick your favorite golf ball color and golf club color for mini golf!',
+        'mg_gear_prompt'
+      );
+    }
+
+    function renderMiniGolfGearPicker() {
+      const equipped = storage.data.equipped || {};
+      const currBall =
+        MINIGOLF_BALL_COLORS.find(c => c.id === equipped.ballColor) || MINIGOLF_BALL_COLORS[0];
+      const currClub =
+        MINIGOLF_CLUB_COLORS.find(c => c.id === equipped.clubColor) || MINIGOLF_CLUB_COLORS[0];
+
+      const ballDot = document.getElementById('preview-ball-dot');
+      const ballLbl = document.getElementById('preview-ball-label');
+      const clubDot = document.getElementById('preview-club-dot');
+      const clubLbl = document.getElementById('preview-club-label');
+
+      if (ballDot) ballDot.style.background = currBall.hex;
+      if (ballLbl) ballLbl.textContent = `Ball: ${currBall.name}`;
+      if (clubDot) clubDot.style.background = currClub.hex;
+      if (clubLbl) clubLbl.textContent = `Club: ${currClub.name}`;
+
+      const ballGrid = document.getElementById('gear-ball-colors-grid');
+      ballGrid.innerHTML = '';
+      MINIGOLF_BALL_COLORS.forEach(c => {
+        const isSel = c.id === currBall.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `color-swatch-btn ${isSel ? 'selected' : ''}`;
+        btn.innerHTML = `
+          <span class="color-dot" style="background:${c.hex}; border-color:${c.stroke};"></span>
+          <span>${c.name}</span>
+        `;
+        btn.addEventListener('click', () => {
+          storage.setMiniGolfColors({ ballColor: c.id });
+          audio.playSfx('pop');
+          audio.speak(`${c.name} golf ball!`, `ball_col_${c.id}`);
+          renderMiniGolfGearPicker();
+        });
+        ballGrid.appendChild(btn);
+      });
+
+      const clubGrid = document.getElementById('gear-club-colors-grid');
+      clubGrid.innerHTML = '';
+      MINIGOLF_CLUB_COLORS.forEach(c => {
+        const isSel = c.id === currClub.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `color-swatch-btn ${isSel ? 'selected' : ''}`;
+        btn.innerHTML = `
+          <span class="color-dot" style="background:${c.hex}; border-color:${c.stroke}; border-radius:8px;"></span>
+          <span>${c.name}</span>
+        `;
+        btn.addEventListener('click', () => {
+          storage.setMiniGolfColors({ clubColor: c.id });
+          audio.playSfx('merge');
+          audio.speak(`${c.name} golf club!`, `club_col_${c.id}`);
+          renderMiniGolfGearPicker();
+        });
+        clubGrid.appendChild(btn);
+      });
+    }
+
+    document.getElementById('btn-start-minigolf-round').addEventListener('click', () => {
+      audio.playSfx('cheer');
+      modalMiniGolfGear.classList.add('hidden');
+      overlayMainMenu.classList.add('hidden');
+      gameState.startMiniGolf(pendingMiniGolfStartHole);
+      syncUIWithGameState(true);
+    });
+
+    document.getElementById('btn-close-minigolf-gear').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalMiniGolfGear.classList.add('hidden');
+      overlayMainMenu.classList.remove('hidden');
+    });
+
+    // ========================================================================
+    // LUKA'S PRO SHOP MODAL
+    // ========================================================================
+    function openShopModal() {
+      renderShopCatalog();
+      modalShop.classList.remove('hidden');
+    }
+
+    function renderShopCatalog() {
+      document.getElementById('shop-coins-banner').textContent = `Your Golf Coins: 🪙 ${storage.data.coins}`;
+      elCoinsValue.textContent = `🪙 ${storage.data.coins}`;
+      elMenuCoins.textContent = `🪙 ${storage.data.coins}`;
+
+      const categories = [
+        { key: 'balls',   equipField: 'ball',   gridId: 'shop-balls-grid' },
+        { key: 'tracers', equipField: 'tracer', gridId: 'shop-tracers-grid' },
+        { key: 'effects', equipField: 'effect', gridId: 'shop-effects-grid' },
+        { key: 'trails',  equipField: 'trail',  gridId: 'shop-trails-grid' },
+        { key: 'pets',    equipField: 'pet',    gridId: 'shop-pets-grid' }
+      ];
+
+      categories.forEach(cat => {
+        const grid = document.getElementById(cat.gridId);
+        grid.innerHTML = '';
+        const unlockedList = storage.data.unlockedShop[cat.key] || [];
+        const currentEquipped = storage.data.equipped[cat.equipField];
+
+        PRO_SHOP_CATALOG[cat.key].forEach(item => {
+          const isUnlocked = unlockedList.includes(item.id);
+          const isEquipped = currentEquipped === item.id;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `shop-card-btn ${isEquipped ? 'equipped' : ''} ${isUnlocked ? 'unlocked' : ''}`;
+          btn.innerHTML = `
+            <span style="font-size:36px;">${item.icon}</span>
+            <span style="font-size:16px;font-weight:900;">${item.name}</span>
+            <span style="font-size:14px;color:${isEquipped ? '#00E676' : '#FFD600'};font-weight:800;">
+              ${isEquipped ? '✅ EQUIPPED' : isUnlocked ? 'TAP TO USE' : `🪙 ${item.cost} COINS`}
+            </span>
+          `;
+          btn.addEventListener('click', () => {
+            const res = storage.buyOrEquipShopItem(cat.key, item.id, item.cost);
+            if (!res.ok) {
+              audio.playSfx('boing');
+              audio.speak(`Keep playing to earn ${item.cost} golf coins!`, `shop_need_coins`);
+              return;
+            }
+            audio.playSfx(res.action === 'purchased' ? 'cheer' : 'pop');
+            audio.speak(`${item.name} equipped!`, `shop_${item.id}`);
+            renderShopCatalog();
+          });
+          grid.appendChild(btn);
+        });
+      });
+    }
+
+    const btnOpenShop = document.getElementById('btn-open-shop');
+    if (btnOpenShop) {
+      btnOpenShop.addEventListener('click', () => {
+        audio.playSfx('pop');
+        openShopModal();
+      });
+    }
+
+    document.getElementById('btn-close-shop')?.addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalShop.classList.add('hidden');
+    });
+
+    // ========================================================================
+    // COURSE SELECT MODAL
+    // ========================================================================
+    function openCoursesModal() {
+      const grid = document.getElementById('courses-grid');
+      grid.innerHTML = '';
+
+      const starImgMap = {
+        gold: `${imgPrefix}/star_gold.svg`,
+        silver: `${imgPrefix}/star_silver.svg`,
+        bronze: `${imgPrefix}/star_bronze.svg`
+      };
+
+      Object.values(COURSE_THEMES).forEach(course => {
+        const rec = storage.data.courseRecords[course.id] || {};
+        const starKey = rec.star;
+        const bestText = rec.bestStrokes !== null && rec.bestStrokes !== undefined
+          ? `Best: ${rec.bestStrokes} Strokes (Par ${course.parTotal})`
+          : `Par ${course.parTotal} • Not Completed Yet`;
+
+        const starBadgeHtml = starKey
+          ? `<img src="${starImgMap[starKey]}" alt="${starKey} star" /><span style="font-size:13px;font-weight:900;color:#FFD600;">${starKey.toUpperCase()}</span>`
+          : `<span style="font-size:32px;opacity:0.35;">⭐</span><span style="font-size:12px;color:#90A4AE;">PLAY</span>`;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'course-card-btn';
+        btn.innerHTML = `
+          <div class="course-card-left">
+            <span class="course-icon">${course.icon}</span>
+            <div>
+              <div class="course-name">${course.name}</div>
+              <div class="course-meta">${course.subtitle}</div>
+              <div class="course-meta" style="color:#80CBC4;font-weight:800;margin-top:4px;">${bestText}</div>
+            </div>
+          </div>
+          <div class="course-star-badge">${starBadgeHtml}</div>
+        `;
+        btn.addEventListener('click', () => {
+          audio.playSfx('pop');
+          modalCourses.classList.add('hidden');
+          overlayMainMenu.classList.add('hidden');
+          gameState.startCourse(course.id, 0);
+          syncUIWithGameState(true);
+        });
+        grid.appendChild(btn);
+      });
+
+      modalCourses.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-play-full18').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalCourses.classList.add('hidden');
+      overlayMainMenu.classList.add('hidden');
+      gameState.startCourse('full18', 0);
+      syncUIWithGameState(true);
+    });
+
+    document.getElementById('btn-close-courses').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalCourses.classList.add('hidden');
+    });
+
+    // ========================================================================
+    // TROPHY ROOM MODAL
+    // ========================================================================
+    function openTrophyModal() {
+      const stats = storage.data.stats;
+      document.getElementById('trophy-stats-summary').textContent =
+        `Holes Completed: ${stats.holesCompleted} • Holes in One: ${stats.holesInOne} • Eagles: ${stats.eagles} • Birdies: ${stats.birdies} • Rescue Shots: ${stats.mishapsTriggered}`;
+
+      const grid = document.getElementById('trophy-grid');
+      grid.innerHTML = '';
+
+      Object.values(storage.data.trophies).forEach(t => {
+        const div = document.createElement('div');
+        div.className = `trophy-item ${t.unlocked ? 'unlocked' : ''}`;
+        div.innerHTML = `
+          <div class="t-icon">${t.icon}</div>
+          <div>
+            <div class="t-title">${t.title} ${t.unlocked ? '✅' : '🔒'}</div>
+            <div class="t-desc">${t.desc}</div>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+
+      modalTrophy.classList.remove('hidden');
+    }
+
+    const btnOpenTrophies = document.getElementById('btn-open-trophies');
+    if (btnOpenTrophies) {
+      btnOpenTrophies.addEventListener('click', () => {
+        audio.playSfx('pop');
+        openTrophyModal();
+      });
+    }
+
+    document.getElementById('btn-close-trophies')?.addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalTrophy.classList.add('hidden');
+    });
+
+    document.getElementById('btn-trophy-to-leaderboard').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalTrophy.classList.add('hidden');
+      openLeaderboardModal();
+    });
+
+    // ========================================================================
+    // MINI-GOLF LEADERBOARD MODAL (BEST ROUNDS & HOLE-BY-HOLE RECORDS)
+    // ========================================================================
+    function openLeaderboardModal() {
+      const lb = storage.data.miniGolfLeaderboard || {
+        bestRoundStrokes: null,
+        par: 18,
+        star: null,
+        holeBestStrokes: {},
+        topRounds: []
+      };
+
+      const summaryEl = document.getElementById('mg-leaderboard-summary');
+      const bestText = lb.bestRoundStrokes !== null
+        ? `${lb.bestRoundStrokes} Strokes (${lb.bestRoundStrokes - 18 >= 0 ? '+' : ''}${lb.bestRoundStrokes - 18})`
+        : 'Not Set Yet';
+      const starText = lb.star ? `⭐ ${lb.star.toUpperCase()}` : 'Play 9 Holes!';
+      const roundsPlayed = (lb.topRounds || []).length;
+
+      summaryEl.innerHTML = `
+        <div class="lb-stat-box">
+          <span class="lb-stat-label">Best 6-Hole Round</span>
+          <span class="lb-stat-val">${bestText}</span>
+        </div>
+        <div class="lb-stat-box">
+          <span class="lb-stat-label">Course Par</span>
+          <span class="lb-stat-val" style="color:#80D8FF;">Par 12</span>
+        </div>
+        <div class="lb-stat-box">
+          <span class="lb-stat-label">Best Star Rating</span>
+          <span class="lb-stat-val" style="color:#00E676;">${starText}</span>
+        </div>
+        <div class="lb-stat-box">
+          <span class="lb-stat-label">Top Rounds Saved</span>
+          <span class="lb-stat-val" style="color:#FFF;">${roundsPlayed}</span>
+        </div>
+      `;
+
+      // Hole-by-Hole Personal Best Grid (Holes 1..6)
+      const holesGrid = document.getElementById('mg-holes-best-grid');
+      holesGrid.innerHTML = '';
+      const obstacleIcons = {
+        windmill: '🎡',
+        pipe_coaster: '🌈',
+        dino_jaw: '🦖',
+        warp_portals: '🌀',
+        pinball_bumpers: '⚡',
+        pirate_cannon: '🏴‍☠️',
+        shark_whirlpool: '🦈',
+        space_rocket: '🚀',
+        ice_cream_mountain: '🍦'
+      };
+
+      MINIGOLF_HOLES.forEach((h, idx) => {
+        const bestHole = (lb.holeBestStrokes || {})[h.number];
+        const hasBest = bestHole !== null && bestHole !== undefined;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `mg-hole-best-card ${hasBest ? 'recorded' : ''}`;
+        card.style.cursor = 'pointer';
+        card.style.fontFamily = 'var(--font-display)';
+        card.style.color = '#FFF';
+        card.innerHTML = `
+          <div>
+            <div style="font-size:15px;font-weight:900;color:#FFF59D;">
+              ${obstacleIcons[h.obstacleType] || '⛳'} Hole ${h.number}: ${h.name}
+            </div>
+            <div style="font-size:13px;color:#B3E5FC;">
+              Par ${h.par} • ${hasBest ? `Best: <strong>${bestHole} ${bestHole === 1 ? 'Stroke (ACE!)' : 'Strokes'}</strong>` : 'Tap to Play!'}
+            </div>
+          </div>
+          <div style="font-size:22px;font-weight:900;color:${hasBest ? '#00E676' : '#90A4AE'};">
+            ${hasBest ? (bestHole === 1 ? '🏆 1' : `${bestHole}`) : '▶️'}
+          </div>
+        `;
+        card.addEventListener('click', () => {
+          audio.playSfx('pop');
+          modalLeaderboard.classList.add('hidden');
+          openMiniGolfGearModal(idx);
+        });
+        holesGrid.appendChild(card);
+      });
+
+      // Top 6-Hole Rounds Leaderboard Table
+      const tableContainer = document.getElementById('mg-top-rounds-container');
+      const rounds = lb.topRounds || [];
+      if (rounds.length === 0) {
+        tableContainer.innerHTML = `
+          <div style="padding:18px; background:rgba(255,255,255,0.06); border-radius:18px; color:#B3E5FC; font-size:18px;">
+            🎡 No full 6-hole Mini-Golf rounds recorded yet! Complete Holes 1–6 to post Luka's score on the Leaderboard!
+          </div>
+        `;
+      } else {
+        const levelBadges = {
+          kindergarten: '🌱 Kindergarten',
+          grade1: '🚀 1st Grade',
+          grade2: '🏆 2nd Grade+'
+        };
+        let rowsHtml = rounds.map((r, i) => {
+          const rankMedal = i === 0 ? '🥇 #1' : i === 1 ? '🥈 #2' : i === 2 ? '🥉 #3' : `#${i + 1}`;
+          const diffSign = r.diff === 0 ? 'E (Par)' : r.diff > 0 ? `+${r.diff}` : `${r.diff}`;
+          return `
+            <tr>
+              <td>${rankMedal}</td>
+              <td style="color:#FFD600;">${r.strokes} Strokes</td>
+              <td style="color:${r.diff <= 0 ? '#00E676' : '#FFF'};">${diffSign}</td>
+              <td>⭐ ${(r.star || 'bronze').toUpperCase()}</td>
+              <td>${levelBadges[r.level] || r.difficulty || '🌱 Kindergarten'}</td>
+              <td style="color:#B3E5FC;">${r.date || r.dateLabel || 'Today'}</td>
+            </tr>
+          `;
+        }).join('');
+
+        tableContainer.innerHTML = `
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Total Strokes</th>
+                <th>vs Par 12</th>
+                <th>Star</th>
+                <th>Math Level</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+      }
+
+      modalLeaderboard.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-play-minigolf-from-lb').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalLeaderboard.classList.add('hidden');
+      openMiniGolfGearModal(0);
+    });
+
+    document.getElementById('btn-close-leaderboard').addEventListener('click', () => {
+      audio.playSfx('pop');
+      modalLeaderboard.classList.add('hidden');
+    });
+
+    // ========================================================================
+    // HIDDEN PARENTAL GATE (3-SECOND CONTINUOUS HOLD ON TOP-LEFT CORNER)
+    // ========================================================================
+    const gateTrigger = document.getElementById('parental-gate-trigger');
+    const gateHoldBar = document.getElementById('gate-hold-bar');
+    let gateTimer = null;
+    let gateStart = 0;
+
+    function startGateHold(e) {
+      if (e && e.button !== undefined && e.button !== 0) return;
+      clearGateHold();
+      audio.playSfx('pop');
+      gateStart = performance.now();
+      gateTimer = setInterval(() => {
+        const elapsed = performance.now() - gateStart;
+        const pct = Math.min(100, (elapsed / 3000) * 100);
+        gateHoldBar.style.width = `${pct}%`;
+        if (elapsed >= 3000) {
+          clearGateHold();
+          openParentalModal();
+        }
+      }, 40);
+    }
+
+    function clearGateHold() {
+      if (gateTimer) {
+        clearInterval(gateTimer);
+        gateTimer = null;
+      }
+      gateHoldBar.style.width = '0%';
+    }
+
+    gateTrigger.addEventListener('pointerdown', startGateHold);
+    gateTrigger.addEventListener('pointerup', clearGateHold);
+    gateTrigger.addEventListener('pointerleave', clearGateHold);
+    gateTrigger.addEventListener('pointercancel', clearGateHold);
+
+    function openParentalModal() {
+      audio.playSfx('merge');
+      refreshParentalButtons();
+
+      const jumper = document.getElementById('parental-hole-jumper');
+      jumper.innerHTML = '';
+      HOLES.forEach((h, idx) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.style.cssText = 'min-width:44px;min-height:44px;border-radius:10px;border:2px solid #FFD600;background:#1E88E5;color:#FFF;font-weight:900;cursor:pointer;';
+        b.textContent = `${h.number}`;
+        b.addEventListener('click', () => {
+          modalParental.classList.add('hidden');
+          overlayMainMenu.classList.add('hidden');
+          gameState.startCourse('full18', idx);
+          syncUIWithGameState(true);
+        });
+        jumper.appendChild(b);
+      });
+
+      modalParental.classList.remove('hidden');
+    }
+
+    function refreshParentalButtons() {
+      const s = storage.getSettings();
+      const diffMeta = DIFFICULTY_LEVELS[s.difficultyLevel || 'kindergarten'] || DIFFICULTY_LEVELS.kindergarten;
+      const adaptBtn = document.getElementById('btn-toggle-adaptive');
+      if (adaptBtn) {
+        const isAdapt = s.adaptiveDifficulty !== false;
+        adaptBtn.textContent = isAdapt
+          ? `Auto-Adapt: ON (Score ${s.adaptiveScore ?? 1}/9)`
+          : 'Auto-Adapt: OFF (Manual)';
+      }
+      const diffBtn = document.getElementById('btn-toggle-difficulty-level');
+      if (diffBtn) {
+        diffBtn.textContent = diffMeta.badge || diffMeta.shortLabel;
+      }
+      document.getElementById('btn-toggle-math-mode').textContent =
+        s.mathMode === 'advanced' ? 'Advanced: Base-10 (300+50)' : 'Starter: Match & Mini-Games';
+      document.getElementById('btn-toggle-voice').textContent =
+        `Voice: ${s.voiceEnabled ? 'ON' : 'OFF'}`;
+      document.getElementById('btn-toggle-sfx').textContent =
+        `SFX: ${s.sfxEnabled ? 'ON' : 'OFF'}`;
+
+      const btnCalcOps = document.getElementById('btn-toggle-calc-ops');
+      if (btnCalcOps) {
+        btnCalcOps.textContent = s.calcAdvancedOps
+          ? 'Operations: + / − / × / ÷ (Advanced)'
+          : 'Operations: + / − Only (Basic)';
+        btnCalcOps.style.background = s.calcAdvancedOps ? '#7C4DFF' : '#0288D1';
+      }
+      document.querySelectorAll('.key-advanced-op').forEach(btn => {
+        btn.classList.toggle('hidden', !s.calcAdvancedOps);
+      });
+    }
+
+    document.getElementById('btn-toggle-adaptive').addEventListener('click', () => {
+      const curr = storage.getSettings().adaptiveDifficulty !== false;
+      storage.updateSettings({ adaptiveDifficulty: !curr });
+      audio.playSfx('pop');
+      refreshParentalButtons();
+    });
+
+    document.getElementById('btn-toggle-difficulty-level').addEventListener('click', () => {
+      const nextId = storage.cycleDifficultyLevel();
+      applyDifficultyLevel(nextId, true);
+    });
+
+    document.getElementById('btn-toggle-math-mode').addEventListener('click', () => {
+      const curr = storage.getSettings().mathMode;
+      storage.updateSettings({ mathMode: curr === 'starter' ? 'advanced' : 'starter' });
+      refreshParentalButtons();
+      gameState._generateChallengeForCurrentStage(false);
+      syncUIWithGameState(false);
+    });
+
+    document.getElementById('btn-toggle-voice').addEventListener('click', () => {
+      const curr = storage.getSettings().voiceEnabled;
+      storage.updateSettings({ voiceEnabled: !curr });
+      refreshParentalButtons();
+    });
+
+    document.getElementById('btn-toggle-sfx').addEventListener('click', () => {
+      const curr = storage.getSettings().sfxEnabled;
+      storage.updateSettings({ sfxEnabled: !curr });
+      refreshParentalButtons();
+    });
+
+    const btnToggleCalcOps = document.getElementById('btn-toggle-calc-ops');
+    if (btnToggleCalcOps) {
+      btnToggleCalcOps.addEventListener('click', () => {
+        storage.toggleCalcAdvancedOps();
+        audio.playSfx('pop');
+        refreshParentalButtons();
+      });
+    }
+
+    document.getElementById('btn-test-voice').addEventListener('click', () => {
+      audio.speak('Hi Luka! Welcome to your eighteen hole golf adventure! Let us hit a super drive!', 'welcome_luka');
+    });
+
+    document.getElementById('btn-reset-scores').addEventListener('click', () => {
+      storage.resetAllProgress();
+      gameState.startCourse('tropical', 0);
+      syncUIWithGameState(false);
+      modalParental.classList.add('hidden');
+    });
+
+    document.getElementById('btn-close-parental').addEventListener('click', () => {
+      modalParental.classList.add('hidden');
+    });
+
+    // ========================================================================
+    // TALKING DINO-GOLF CALCULATOR CONTROLLER
+    // ========================================================================
+    const btnMenuCalculator = document.getElementById('menu-btn-calculator');
+    const btnCalcBack = document.getElementById('btn-calc-back');
+    const elCalcLcdHistory = document.getElementById('calc-lcd-history');
+    const elCalcLcdValue = document.getElementById('calc-lcd-value');
+    const elCalcCaption = document.getElementById('calc-equation-caption');
+    const elCalcStageBanner = document.getElementById('calc-stage-banner');
+    const elCalcBannerText = document.getElementById('calc-banner-text');
+    const elCalcSpritesContainer = document.getElementById('calc-sprites-container');
+    const btnCalcClear = document.getElementById('btn-calc-clear');
+    const btnCalcBackspace = document.getElementById('btn-calc-backspace');
+    const btnCalcEquals = document.getElementById('btn-calc-equals');
+
+    let calcCurrentInput = '0';
+    let calcFirstOperand = null;
+    let calcOperator = null;
+    let calcWaitingForSecond = false;
+    let calcActiveEffect = 'cars';
+    let calcCountInterval = null;
+
+    const DIGIT_WORDS = {
+      '0': 'zero',
+      '1': 'one',
+      '2': 'two',
+      '3': 'three',
+      '4': 'four',
+      '5': 'five',
+      '6': 'six',
+      '7': 'seven',
+      '8': 'eight',
+      '9': 'nine'
+    };
+
+    const OP_WORDS = {
+      '+': 'plus',
+      '-': 'minus',
+      '*': 'times',
+      '/': 'divided by'
+    };
+
+    function clearCountingParade() {
+      if (calcCountInterval) {
+        clearInterval(calcCountInterval);
+        calcCountInterval = null;
+      }
+    }
+
+    function openCalculator() {
+      clearCountingParade();
+      audio.playSfx('pop');
+      overlayMainMenu.classList.add('hidden');
+      if (modalCalculator) modalCalculator.classList.remove('hidden');
+      resetCalculatorDisplay();
+      refreshParentalButtons();
+    }
+
+    function closeCalculator() {
+      clearCountingParade();
+      audio.playSfx('pop');
+      if (modalCalculator) modalCalculator.classList.add('hidden');
+      overlayMainMenu.classList.remove('hidden');
+    }
+
+    if (btnMenuCalculator) {
+      btnMenuCalculator.addEventListener('click', openCalculator);
+    }
+    if (btnCalcBack) {
+      btnCalcBack.addEventListener('click', closeCalculator);
+    }
+
+    function resetCalculatorDisplay() {
+      clearCountingParade();
+      calcCurrentInput = '0';
+      calcFirstOperand = null;
+      calcOperator = null;
+      calcWaitingForSecond = false;
+      if (elCalcLcdHistory) elCalcLcdHistory.textContent = 'READY TO SOLVE';
+      if (elCalcLcdValue) elCalcLcdValue.textContent = '0';
+      if (elCalcCaption) elCalcCaption.textContent = 'Tap numbers to hear them speak! Press = to solve!';
+      if (elCalcStageBanner) elCalcStageBanner.classList.add('hidden');
+      if (elCalcSpritesContainer) elCalcSpritesContainer.innerHTML = '';
+    }
+
+    // Effect Pill Selector
+    document.querySelectorAll('.calc-effect-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.calc-effect-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        calcActiveEffect = pill.dataset.effect;
+        audio.playSfx('pop');
+      });
+    });
+
+    // Digit Keys (0-9) — Instant Speech With Zero Delay!
+    document.querySelectorAll('.calc-key.key-num').forEach(key => {
+      key.addEventListener('click', () => {
+        clearCountingParade();
+        const val = key.dataset.val;
+        audio.playSfx('calc_beep');
+        const word = DIGIT_WORDS[val] || val;
+        audio.speakInstant(word);
+
+        if (calcWaitingForSecond) {
+          calcCurrentInput = val;
+          calcWaitingForSecond = false;
+        } else {
+          if (calcCurrentInput === '0') {
+            calcCurrentInput = val;
+          } else if (calcCurrentInput.length < 8) {
+            calcCurrentInput += val;
+          }
+        }
+        if (elCalcLcdValue) elCalcLcdValue.textContent = calcCurrentInput;
+      });
+    });
+
+    // Operator Keys (+, -, *, /) — Instant Speech With Zero Delay!
+    document.querySelectorAll('.calc-key.key-op').forEach(key => {
+      key.addEventListener('click', () => {
+        clearCountingParade();
+        const op = key.dataset.op;
+        audio.playSfx('calc_beep');
+        const word = OP_WORDS[op] || op;
+        audio.speakInstant(word);
+
+        const currentVal = parseFloat(calcCurrentInput) || 0;
+        calcFirstOperand = currentVal;
+        calcOperator = op;
+        calcWaitingForSecond = true;
+
+        const opSym = op === '*' ? '×' : (op === '/' ? '÷' : op);
+        if (elCalcLcdHistory) elCalcLcdHistory.textContent = `${calcFirstOperand} ${opSym}`;
+      });
+    });
+
+    // Clear Button
+    if (btnCalcClear) {
+      btnCalcClear.addEventListener('click', () => {
+        clearCountingParade();
+        audio.playSfx('pop');
+        audio.speakInstant('Clear');
+        resetCalculatorDisplay();
+      });
+    }
+
+    // Backspace Button
+    if (btnCalcBackspace) {
+      btnCalcBackspace.addEventListener('click', () => {
+        clearCountingParade();
+        audio.playSfx('pop');
+        if (calcCurrentInput.length > 1) {
+          calcCurrentInput = calcCurrentInput.slice(0, -1);
+        } else {
+          calcCurrentInput = '0';
+        }
+        if (elCalcLcdValue) elCalcLcdValue.textContent = calcCurrentInput;
+      });
+    }
+
+    // Equals Button — Evaluates Exact Equation, Instant Audio & Slow Counting Parade!
+    if (btnCalcEquals) {
+      btnCalcEquals.addEventListener('click', () => {
+        clearCountingParade();
+        const b = parseFloat(calcCurrentInput) || 0;
+        if (calcFirstOperand === null || calcOperator === null) {
+          audio.playSfx('calc_equals');
+          const singleWord = MathEngine.numberToWords(b);
+          if (elCalcCaption) elCalcCaption.textContent = `${b}`;
+          audio.speakInstant(`${singleWord}!`);
+          triggerCalcCelebration(b, calcActiveEffect);
+          return;
+        }
+
+        const a = calcFirstOperand;
+        const op = calcOperator;
+        let c = 0;
+
+        if (op === '+') {
+          c = a + b;
+        } else if (op === '-') {
+          c = a - b;
+        } else if (op === '*') {
+          c = a * b;
+        } else if (op === '/') {
+          if (b === 0) {
+            audio.playSfx('boing');
+            if (elCalcLcdValue) elCalcLcdValue.textContent = 'Error';
+            if (elCalcCaption) elCalcCaption.textContent = 'Cannot divide by zero!';
+            audio.speakInstant('Cannot divide by zero!');
+            return;
+          }
+          c = Math.round((a / b) * 100) / 100;
+        }
+
+        const opSym = op === '*' ? '×' : (op === '/' ? '÷' : op);
+        if (elCalcLcdHistory) elCalcLcdHistory.textContent = `${a} ${opSym} ${b} =`;
+        if (elCalcLcdValue) elCalcLcdValue.textContent = `${c}`;
+        if (elCalcCaption) elCalcCaption.textContent = `${a} ${opSym} ${b} = ${c}`;
+
+        audio.playSfx('calc_equals');
+
+        const aWord = MathEngine.numberToWords(a);
+        const bWord = MathEngine.numberToWords(b);
+        const cWord = MathEngine.numberToWords(c);
+        const sentence = `${aWord} ${OP_WORDS[op]} ${bWord} equals ${cWord}!`;
+        // Speak the EXACT calculated equation dynamically with zero lag!
+        audio.speakInstant(sentence);
+
+        triggerCalcCelebration(c, calcActiveEffect);
+
+        calcFirstOperand = null;
+        calcOperator = null;
+        calcWaitingForSecond = true;
+        calcCurrentInput = String(c);
+      });
+    }
+
+    // Steady, Rhythmic Counting Parade — Up to 100 Sprites, or Giant Hero for > 100!
+    function triggerCalcCelebration(answerVal, selectedEffect) {
+      if (!elCalcSpritesContainer || !elCalcStageBanner || !elCalcBannerText) return;
+      clearCountingParade();
+
+      const absVal = Math.abs(Math.round(answerVal));
+      if (answerVal === 0) {
+        elCalcSpritesContainer.innerHTML = '';
+        elCalcStageBanner.classList.remove('hidden');
+        elCalcBannerText.textContent = '🎉 ZERO! PERFECT BALANCE! 0️⃣ 🎉';
+        audio.playSfx('cheer');
+        return;
+      }
+
+      let effect = selectedEffect;
+      if (effect === 'random') {
+        const effects = ['cars', 'balls', 'dinos', 'pizzas'];
+        effect = effects[Math.floor(Math.random() * effects.length)];
+      }
+
+      let emojiChoices = ['🏎️', '🚗', '🚙', '🏎️'];
+      let itemLabelPlural = 'Race Cars';
+      let itemIcon = '🏎️';
+      let spriteClass = 'calc-car-sprite';
+
+      if (effect === 'balls') {
+        emojiChoices = ['⛳', '⚪', '🟡', '🔴', '⭐'];
+        itemLabelPlural = 'Golf Balls';
+        itemIcon = '⛳';
+        spriteClass = 'calc-ball-sprite';
+      } else if (effect === 'dinos') {
+        emojiChoices = ['🦖', '🦕', '🐊', '🐾', '🦖'];
+        itemLabelPlural = 'Dinosaurs';
+        itemIcon = '🦖';
+        spriteClass = 'calc-dino-sprite';
+      } else if (effect === 'pizzas') {
+        emojiChoices = ['🍕', '🍕✨', '🧀', '🍕🔥'];
+        itemLabelPlural = 'Pizzas';
+        itemIcon = '🍕';
+        spriteClass = 'calc-pizza-sprite';
+      }
+
+      elCalcSpritesContainer.innerHTML = '';
+      elCalcStageBanner.classList.remove('hidden');
+
+      // For anything larger than 100: Show a large hero sprite with the final number next to it!
+      if (absVal > 100) {
+        const numText = answerVal < 0 ? `-${absVal.toLocaleString()}` : absVal.toLocaleString();
+        elCalcBannerText.textContent = `🎉 ${numText} ${itemLabelPlural.toUpperCase()}! 🎉`;
+        audio.playSfx('cheer');
+
+        const hero = document.createElement('div');
+        hero.className = 'calc-giant-hero';
+        const flipClass = effect === 'cars' ? 'flip-car' : '';
+        hero.innerHTML = `
+          <div class="calc-giant-hero-bob">
+            <span class="calc-giant-hero-graphic ${flipClass}">${itemIcon}</span>
+          </div>
+          <span class="calc-giant-hero-number">${numText}</span>
+        `;
+        elCalcSpritesContainer.appendChild(hero);
+        return;
+      }
+
+      // For numbers <= 100: Count up to 100 with individual numbered sprites!
+      const count = absVal;
+
+      // Comfortable, child-friendly counting tempo:
+      const stepMs = count <= 6
+        ? 480
+        : (count <= 12
+          ? 360
+          : (count <= 20
+            ? 260
+            : (count <= 40
+              ? 160
+              : (count <= 70
+                ? 100
+                : 70))));
+
+      let currentStep = 0;
+
+      const spawnStep = () => {
+        currentStep++;
+        if (currentStep > count) {
+          clearCountingParade();
+          elCalcBannerText.textContent = `🎉 ALL ${absVal} ${itemLabelPlural.toUpperCase()}! 🎉`;
+          audio.playSfx('cheer');
+          return;
+        }
+
+        audio.playSfx('count_step');
+        elCalcBannerText.textContent = `${itemIcon} Counting ${itemLabelPlural}: ${currentStep} of ${absVal}!`;
+
+        const s = document.createElement('div');
+        s.className = `calc-numbered-sprite ${spriteClass}`;
+        s.style.top = `${6 + (currentStep % 5) * 18}%`;
+        s.innerHTML = `
+          <span class="calc-item-graphic">${emojiChoices[(currentStep - 1) % emojiChoices.length]}</span>
+          <span class="calc-item-badge">${currentStep}</span>
+        `;
+        elCalcSpritesContainer.appendChild(s);
+      };
+
+      spawnStep();
+      calcCountInterval = setInterval(spawnStep, stepMs);
+    }
+
+    // Boot Game!
+    initGame();
+  </script>
+</body>
+</html>
