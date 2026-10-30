@@ -1,0 +1,121 @@
+[gd_scene format=3 uid="uid://c8m8x1course01"]
+
+[ext_resource type="Script" path="res://scripts/Course.gd" id="1_course_script"]
+[ext_resource type="Texture2D" path="res://assets/cup.png" id="2_cup_tex"]
+[ext_resource type="Texture2D" path="res://assets/flag.png" id="3_flag_tex"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cup"]
+radius = 20.0
+
+[sub_resource type="Gradient" id="Gradient_sink"]
+offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(1, 0.9, 0.2, 1, 1, 0.5, 0.1, 1, 1, 1, 1, 0)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wall"]
+friction = 0.2
+bounce = 0.75
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tree"]
+radius = 32.0
+
+[node name="Course" type="Node2D"]
+script = ExtResource("1_course_script")
+
+[node name="RoughBackground" type="ColorRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 800.0
+color = Color(0.11, 0.38, 0.13, 1)
+
+[node name="FairwayPolygon" type="Polygon2D" parent="."]
+color = Color(0.18, 0.52, 0.2, 1)
+polygon = PackedVector2Array(80, 300, 220, 240, 500, 220, 800, 220, 1120, 260, 1180, 400, 1120, 560, 800, 600, 450, 590, 200, 570, 80, 500)
+
+[node name="GreenPolygon" type="Polygon2D" parent="."]
+color = Color(0.3, 0.72, 0.32, 1)
+polygon = PackedVector2Array(820, 400, 850, 310, 930, 260, 1040, 270, 1110, 340, 1130, 420, 1090, 510, 990, 540, 900, 520, 840, 460)
+
+[node name="BunkerArea" type="Area2D" parent="."]
+position = Vector2(760, 500)
+collision_layer = 4
+collision_mask = 1
+
+[node name="BunkerPolygon" type="Polygon2D" parent="BunkerArea"]
+color = Color(0.92, 0.82, 0.52, 1)
+polygon = PackedVector2Array(-70, -30, 0, -45, 60, -25, 75, 20, 30, 45, -45, 40, -80, 10)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="BunkerArea"]
+polygon = PackedVector2Array(-70, -30, 0, -45, 60, -25, 75, 20, 30, 45, -45, 40, -80, 10)
+
+[node name="TeeMarker" type="Marker2D" parent="."]
+position = Vector2(180, 400)
+
+[node name="TeeVisual" type="Polygon2D" parent="TeeMarker"]
+color = Color(0.95, 0.95, 0.95, 0.9)
+polygon = PackedVector2Array(-14, -8, 14, -8, 14, 8, -14, 8)
+
+[node name="CupArea" type="Area2D" parent="."]
+position = Vector2(1000, 400)
+collision_layer = 2
+collision_mask = 1
+
+[node name="CupSprite" type="Sprite2D" parent="CupArea"]
+texture = ExtResource("2_cup_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CupArea"]
+shape = SubResource("CircleShape2D_cup")
+
+[node name="Flag" type="Sprite2D" parent="CupArea"]
+position = Vector2(12, -26)
+texture = ExtResource("3_flag_tex")
+
+[node name="SinkParticles" type="CPUParticles2D" parent="CupArea"]
+emitting = false
+amount = 45
+one_shot = true
+explosiveness = 0.85
+lifetime = 1.2
+spread = 180.0
+gravity = Vector2(0, -60)
+initial_velocity_min = 60.0
+initial_velocity_max = 140.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+color_ramp = SubResource("Gradient_sink")
+
+[node name="CourseObstacles" type="Node2D" parent="."]
+
+[node name="PalmTree1" type="StaticBody2D" parent="CourseObstacles"]
+position = Vector2(560, 260)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="TrunkVisual" type="Polygon2D" parent="CourseObstacles/PalmTree1"]
+color = Color(0.55, 0.35, 0.18, 1)
+polygon = PackedVector2Array(-10, -20, 10, -20, 14, 25, -14, 25)
+
+[node name="FrondsVisual" type="Polygon2D" parent="CourseObstacles/PalmTree1"]
+color = Color(0.2, 0.7, 0.25, 1)
+polygon = PackedVector2Array(0, -45, -35, -25, -45, 0, -20, -10, 0, -20, 20, -10, 45, 0, 35, -25)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CourseObstacles/PalmTree1"]
+shape = SubResource("CircleShape2D_tree")
+
+[node name="PalmTree2" type="StaticBody2D" parent="CourseObstacles"]
+position = Vector2(650, 560)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="TrunkVisual" type="Polygon2D" parent="CourseObstacles/PalmTree2"]
+color = Color(0.55, 0.35, 0.18, 1)
+polygon = PackedVector2Array(-10, -20, 10, -20, 14, 25, -14, 25)
+
+[node name="FrondsVisual" type="Polygon2D" parent="CourseObstacles/PalmTree2"]
+color = Color(0.2, 0.7, 0.25, 1)
+polygon = PackedVector2Array(0, -45, -35, -25, -45, 0, -20, -10, 0, -20, 20, -10, 45, 0, 35, -25)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CourseObstacles/PalmTree2"]
+shape = SubResource("CircleShape2D_tree")
+
+[node name="Boundaries" type="StaticBody2D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Boundaries"]
+polygon = PackedVector2Array(20, 20, 1260, 20, 1260, 780, 20, 780, 20, 20, 0, 0, 0, 800, 1280, 800, 1280, 0, 0, 0)

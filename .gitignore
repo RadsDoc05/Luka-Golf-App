@@ -5,3 +5,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 .antigravity/
+
+# Godot 4 project cache
+.godot/
+godot/.godot/
+*.translation
+

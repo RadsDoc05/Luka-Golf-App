@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://cxmain001"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main_script"]
+[ext_resource type="PackedScene" uid="uid://c8m8x1course01" path="res://scenes/Course.tscn" id="2_course"]
+[ext_resource type="PackedScene" uid="uid://d3m8y2k11ball" path="res://scenes/Ball.tscn" id="3_ball"]
+[ext_resource type="PackedScene" uid="uid://b7hud001" path="res://scenes/HUD.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://m1modal001" path="res://scenes/MathModal.tscn" id="5_math_modal"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
+bg_color = Color(0.08, 0.12, 0.18, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.2, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main_script")
+
+[node name="Course" parent="." instance=ExtResource("2_course")]
+
+[node name="Ball" parent="." instance=ExtResource("3_ball")]
+position = Vector2(180, 400)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="MathModal" parent="." instance=ExtResource("5_math_modal")]
+
+[node name="CelebrationLayer" type="CanvasLayer" parent="."]
+layer = 8
+visible = false
+
+[node name="BannerPanel" type="Panel" parent="CelebrationLayer"]
+custom_minimum_size = Vector2(620, 180)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -90.0
+offset_right = 310.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="Banner" type="Label" parent="CelebrationLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -290.0
+offset_top = -65.0
+offset_right = 290.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_font_sizes/font_size = 36
+text = "🌟 HOLE COMPLETE! 🌟"
+horizontal_alignment = 1
+vertical_alignment = 1
